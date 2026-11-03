@@ -8,7 +8,7 @@ On 2026-11-03, all eight dedicated incognito browser checks passed against the p
 
 Type checking, 29 unit tests, 14 updater tests, 36 existing redirect browser check groups and seven popup UI scenarios also passed. Both hosted workflows now run the incognito suite. The user guides explain native controls and memory-only per-tab lifetime. All browser tests use disposable profiles; the user's Brave controls remain untouched.
 
-Release v0.1.5 publication and permanent installation are pending. Exact local evidence is in ignored test-results/incognito.json, extension.json and ui.json.
+The v0.1.5 [source checks](https://github.com/Nulifyer/redirect-path-chrome-extension/actions/runs/41697324934) passed, but its [tagged-release build](https://github.com/Nulifyer/redirect-path-chrome-extension/actions/runs/41697324904) exposed a test race: network completion preceded navigation commit, so the later unchanged regular capture included document IDs absent from the early baseline. The comparison now waits for both completion and commit. The failed tag remains unchanged; no v0.1.5 release was published. Release v0.1.6 publication and permanent installation are pending. Exact local evidence is in ignored test-results/incognito.json, extension.json and ui.json.
 
 ## Redirect scenario expansion and Maps
 

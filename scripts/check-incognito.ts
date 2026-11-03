@@ -52,7 +52,8 @@ try {
   mark('the standard browser Allow in incognito toggle enables access');
   await regular.reload();
   await regular.goto(base+'/redirect');
-  const regularState=await waitState(regularId,s=>s?.capture.complete===true&&s.capture.hops.length===2);
+  // Network completion can precede the commit that supplies document IDs.
+  const regularState=await waitState(regularId,s=>s?.capture.complete===true&&s.capture.hops.length===2&&s.request?.committed===true);
   const privateWindow=await worker.evaluate(url=>chrome.windows.create({incognito:true,url}),base+'/redirect');
   assert(privateWindow);
   const privateId=privateWindow.tabs?.[0]?.id;

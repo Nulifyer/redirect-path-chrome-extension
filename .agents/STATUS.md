@@ -2,7 +2,7 @@
 
 Updated: 2026-11-03
 Owner: primary agent
-State: user-controlled incognito verified locally; release preparation in progress
+State: user-controlled incognito verified locally; hosted test timing fix in progress
 
 ## Project state
 
@@ -16,15 +16,15 @@ The README now introduces the product; `docs/` contains end-user guides and exam
 
 ## Current batch
 
-Remove the incognito restriction and preserve normal browser controls, per the user's explicit correction. Use standard spanning mode with per-tab session-memory capture. Add browser permission, capture, popup, lifetime and worker-restoration checks, then publish/install v0.1.5. Do not operate the user's Brave controls.
+Remove the incognito restriction and preserve normal browser controls, per the user's explicit correction. Use standard spanning mode with per-tab session-memory capture. Add browser permission, capture, popup, lifetime and worker-restoration checks, then publish/install v0.1.6. Do not operate the user's Brave controls.
 
 ## In progress
 
-Standard spanning mode and live-tab hydration support the browser's incognito permission. All eight incognito checks, 36 redirect check groups, 29 unit tests, 14 updater tests and the popup UI suite pass. No delegated tasks.
+Standard spanning mode and live-tab hydration support the browser's incognito permission. Local checks passed. The v0.1.5 hosted release failed when its new test compared a regular capture before navigation commit supplied document IDs. The test now waits for network completion and commit before taking its baseline. No runtime change or weakened comparison. No delegated tasks.
 
 ## Next action
 
-Commit/tag v0.1.5, run hosted checks, verify downloaded release assets, publish, and run redirect-inspector-update. Keep the user's native incognito/site-access choices available; leave Brave controls to the user.
+Verify the settled-baseline test, commit/tag v0.1.6 without moving v0.1.5, run hosted checks, verify downloaded release assets, publish, and run redirect-inspector-update. Keep the user's native incognito/site-access choices available; leave Brave controls to the user.
 
 ## Blockers
 
