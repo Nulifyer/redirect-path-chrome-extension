@@ -12,7 +12,13 @@ All eight incognito browser checks also passed, including automatic requestSubmi
 
 The real popup displays 302 / JS / FORM / 303 / 302 / 200 and preserves HTTP 200 response details on the FORM step. Its default JSON export redacts the callback code. The form-body sentinel is absent from stored captures and exports. Existing ordinary clicks, method changes, tab cleanup, session lifetime and no-external-request checks pass.
 
-This reproduces the mechanism with disposable local provider origins, not the user's private organization deployment. Release v0.1.7 publication and permanent installation are pending. Ignored evidence: test-results/auth-before-fix.log, auth-after-fix.log, extension.json and auth-popup.png.
+This reproduces the mechanism with disposable local provider origins, not the user's private organization deployment. The v0.1.7 [source checks](https://github.com/Nulifyer/redirect-path-chrome-extension/actions/runs/41700585994) and [tagged-release workflow](https://github.com/Nulifyer/redirect-path-chrome-extension/actions/runs/41700602156) passed for source commit `7178d7f84db220967bdb36d8c369a1a8b77543ec`.
+
+[v0.1.7](https://github.com/Nulifyer/redirect-path-chrome-extension/releases/tag/v0.1.7) was published after the downloaded checksum, metadata, all 15 ZIP entries and helper matched the clean local tagged build. ZIP SHA-256: `e205d445611f83f7cc652f4f23044fa624e38247d944bcbb9248e7637bce3aa5`.
+
+The installed end-user helper updated the permanent directory to v0.1.7. All 15 installed files and the helper match the hosted assets. Check-only reports Latest 0.1.7 / Installed 0.1.7. Browser reload remains the user's step, and no user browser profile was changed.
+
+Ignored evidence: test-results/auth-before-fix.log, auth-after-fix.log, extension.json, auth-popup.png, hosted-release-v0.1.7/verification.json and installed-release-v0.1.7.json.
 
 ## User-controlled incognito access
 
