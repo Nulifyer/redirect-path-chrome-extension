@@ -8,7 +8,13 @@ On 2026-11-03, all eight dedicated incognito browser checks passed against the p
 
 Type checking, 29 unit tests, 14 updater tests, 36 existing redirect browser check groups and seven popup UI scenarios also passed. Both hosted workflows now run the incognito suite. The user guides explain native controls and memory-only per-tab lifetime. All browser tests use disposable profiles; the user's Brave controls remain untouched.
 
-The v0.1.5 [source checks](https://github.com/Nulifyer/redirect-path-chrome-extension/actions/runs/41697324934) passed, but its [tagged-release build](https://github.com/Nulifyer/redirect-path-chrome-extension/actions/runs/41697324904) exposed a test race: network completion preceded navigation commit, so the later unchanged regular capture included document IDs absent from the early baseline. The comparison now waits for both completion and commit. The failed tag remains unchanged; no v0.1.5 release was published. Release v0.1.6 publication and permanent installation are pending. Exact local evidence is in ignored test-results/incognito.json, extension.json and ui.json.
+The v0.1.5 [source checks](https://github.com/Nulifyer/redirect-path-chrome-extension/actions/runs/41697324934) passed, but its [tagged-release build](https://github.com/Nulifyer/redirect-path-chrome-extension/actions/runs/41697324904) exposed a test race: network completion preceded navigation commit, so the later unchanged regular capture included document IDs absent from the early baseline. The comparison now waits for both completion and commit. The failed tag remains unchanged; no v0.1.5 release was published. The v0.1.6 [source checks](https://github.com/Nulifyer/redirect-path-chrome-extension/actions/runs/41698058816) and [tagged-release workflow](https://github.com/Nulifyer/redirect-path-chrome-extension/actions/runs/41698045376) passed, including the full browser and incognito suites. The tagged workflow checked out `v0.1.6`, source commit `9c5e33e39a37c8fd1bfd4e557ea5e869356000ab`.
+
+[v0.1.6](https://github.com/Nulifyer/redirect-path-chrome-extension/releases/tag/v0.1.6) was published after its downloaded checksum, metadata, all 15 ZIP entries and helper matched the clean local tagged build. ZIP SHA-256: `f478a79b2dfcde0d9d66414fb750d17402c5373f4f8bc25f3b15f7b50161cda8`.
+
+The actual installed end-user helper updated the permanent directory to v0.1.6. All 15 installed files and the helper match the hosted assets. The installed manifest uses spanning incognito, and the helper reports Latest 0.1.6 / Installed 0.1.6. Browser reload and native permission changes remain the user's step. No user browser profile was changed.
+
+Ignored evidence: test-results/incognito.json, extension.json, ui.json, hosted-release-v0.1.6/verification.json and installed-release-v0.1.6.json.
 
 ## Redirect scenario expansion and Maps
 

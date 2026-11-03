@@ -12,8 +12,8 @@ The public key is an identity input, not a publisher signature or an automatic-u
 
 ```sh
 bun run package
-bun run package --check --tag=v0.1.4
-bun run package --tag=v0.1.4
+bun run package --check --tag=v0.1.6
+bun run package --tag=v0.1.6
 ```
 
 The first command permits local preview builds. Tagged commands require clean committed source and a tag pointing at HEAD.
@@ -35,7 +35,7 @@ Only the extension build, metadata, instructions, and licenses enter the ZIP. Au
 ## Hosted checks
 
 `.github/workflows/checks.yml` runs on main pushes and pull requests.
-It runs type checks, unit tests, updater tests, packaging, prototype UI checks, and real extension browser tests.
+It runs type checks, unit tests, updater tests, packaging, prototype UI checks, real extension browser tests, and native incognito permission/capture tests.
 The browser tests install the built release directory in a disposable profile.
 
 ## Draft-release workflow
@@ -68,7 +68,7 @@ Web Store credentials, listing assets, OAuth, and release-triggered submission r
 
 ## Published version
 
-The latest public package is [v0.1.4](https://github.com/Nulifyer/redirect-path-chrome-extension/releases/tag/v0.1.4).
-Its hosted release workflow passed, and the downloaded package and helper were verified against the tagged local build. The actual end-user helper updated the permanent installation to 0.1.4, and all installed files match the public ZIP. Browser activation is left to the user.
+The latest public package is [v0.1.6](https://github.com/Nulifyer/redirect-path-chrome-extension/releases/tag/v0.1.6).
+Its hosted release workflow passed, and the downloaded package and helper were verified against the tagged local build. The actual end-user helper updated the permanent installation to 0.1.6, and all installed files match the public ZIP. Browser activation is left to the user.
 The first release, v0.1.1, also passed an actual public-helper installation, replacement, and browser Reload that preserved identity and settings.
 Exact evidence is in [verification](VERIFICATION.md).
