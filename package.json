@@ -1,0 +1,30 @@
+{
+  "name": "redirect-path-chrome-extension",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "bun scripts/build.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "test:ui": "bun scripts/check-ui.ts",
+    "test:browser": "bun scripts/check-extension.ts",
+    "package": "bun scripts/package.ts",
+    "test:updater": "python3 -B -m unittest discover -s tests/updater -p '*_test.py' -v"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.9.0",
+    "lucide-react": "^0.564.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/chrome": "^0.3.7",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "playwright": "^1.58.0",
+    "typescript": "^5.9.0"
+  },
+  "license": "MIT"
+}

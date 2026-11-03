@@ -1,0 +1,10 @@
+node_modules/
+dist/
+research/artifacts/
+research/t3-*
+test-results/
+.env*
+*.pem
+
+__pycache__/
+*.pyc

@@ -1,0 +1,73 @@
+name: Prepare GitHub release
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag matching package and manifest versions, such as v0.1.0
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: release-${{ inputs.tag }}
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.3
+      - run: bun install --frozen-lockfile
+      - name: Validate source and tag
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: bun run package --check "--tag=$RELEASE_TAG"
+      - run: bun run typecheck
+      - run: bun test
+      - run: bun run test:updater
+      - name: Build tagged installation package
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: bun run package "--tag=$RELEASE_TAG"
+      - run: bunx playwright install --with-deps chromium
+      - run: bun run test:ui
+      - run: bun run test:browser
+        env:
+          EXTENSION_DIR: dist/release/extension
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release
+          path: |
+            dist/release/*.zip
+            dist/release/SHA256SUMS
+            dist/release/release.json
+            dist/release/INSTALL.md
+            dist/release/update-redirect-inspector.py
+          if-no-files-found: error
+  draft:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: release
+          path: package
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: >-
+          gh release create "$RELEASE_TAG" --verify-tag --draft
+          --title "Redirect Inspector $RELEASE_TAG"
+          --notes-file package/INSTALL.md
+          package/*.zip package/SHA256SUMS package/release.json package/INSTALL.md package/update-redirect-inspector.py

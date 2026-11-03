@@ -1,0 +1,52 @@
+{
+  "manifest_version": 3,
+  "name": "Redirect Inspector",
+  "version": "0.1.0",
+  "description": "Inspect page redirects, HTTP status codes, response headers and server IPs. All captures stay in your browser session.",
+  "minimum_chrome_version": "120",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjDh132yepC/3RWPgJPIPEwr9MxkMJdsoH9mw7LYKOeIp4VClnvungKTtKEkS82O3RHF4vfTDk87sTmaKiNxwtqxWUbGxdUIxOStdAIrz4tz1w/EbZNPDZpIRA6Kyg+rxH4ne/cGnDZjTVn1asi2JplXDCbUAjpbB5UVmDkAL9pJDHqu1dBjDVVORsgY7szD6jK6p7XS47BHbL8em//ofm2DtqVrL01uhdpE0eX9ahL9MRU76yE/iJGpNKmlU1qlT0z2eQqEedHPLlYcrzAiyreJGzU57LzzhnuSDOt+vzR4qa9hepF4ots0Z0TbYvVIfj5hnZVKj+awyQSovsZwN7wIDAQAB",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Inspect redirects",
+    "default_icon": {
+      "16": "icon-16.png",
+      "32": "icon-32.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "permissions": [
+    "webRequest",
+    "webNavigation",
+    "storage"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ],
+  "incognito": "not_allowed",
+  "content_security_policy": {
+    "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'"
+  },
+  "icons": {
+    "16": "icon-16.png",
+    "32": "icon-32.png",
+    "48": "icon-48.png",
+    "128": "icon-128.png"
+  }
+}
