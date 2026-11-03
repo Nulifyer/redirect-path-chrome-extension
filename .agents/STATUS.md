@@ -2,7 +2,7 @@
 
 Updated: 2026-11-03
 Owner: primary agent
-State: implemented, verified, and published
+State: icon update verified locally; release preparation in progress
 
 ## Project state
 
@@ -16,15 +16,15 @@ The README now introduces the product; `docs/` contains end-user guides and exam
 
 ## Current batch
 
-Completed: chain badges show JS, META, HSTS, or the HTTP code. Repeated row subtitles are removed; selected-step details retain the full description, HTTP status, and meta delay. v0.1.2 is published and available to the updater.
+Replace the old pixel-drawn icon with original SVG artwork and antialiased PNGs. The rounded route arrow and starting dot were inspected at native toolbar sizes on dark and light backgrounds. Prepare v0.1.3 through the established release workflow.
 
 ## In progress
 
-No running implementation or delegated tasks.
+Final package validation and GitHub delivery. No delegated tasks.
 
 ## Next action
 
-Respond to installation or feature feedback. Discuss Chrome Web Store publication only when requested. Increase both version owners and use the documented tagged-release workflow for the next runtime release.
+Commit the inspected icon update, tag v0.1.3, dispatch the release workflow, and verify downloaded artifacts before publication.
 
 ## Blockers
 

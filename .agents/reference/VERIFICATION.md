@@ -1,5 +1,13 @@
 # Verification
 
+## Icon artwork
+
+The original SVG master uses rounded route geometry and a starting dot on a blue tile. librsvg generated antialiased 16, 32, 48, and 128 pixel RGBA exports. All four dimensions, PNG format, and byte-for-byte copying into the extension build were verified. The artwork was inspected at native toolbar sizes on light and dark surfaces and at 128 pixels. The inline preview had no console messages.
+
+Type checking and the build passed. All runtime JavaScript, HTML, and CSS remain byte-identical to the published v0.1.2 ZIP. The obsolete procedural raster generator was removed after the build switched to committed PNG assets; there are no surviving imports. No new build dependency or extension permission was added.
+
+Release v0.1.3 validation and publication are in progress. No user browser profile was modified.
+
 ## Redirect mechanism badges
 
 On 2026-11-03, chain badges were changed to JS, META, HSTS, or the HTTP response code. Redundant per-row descriptions moved to the selected response heading; that heading and badge tooltips retain the HTTP status, meta delay, and JavaScript inference distinction.

@@ -39,6 +39,8 @@ The selected step's heading retains its HTTP status and full description, includ
 
 ## Tokens and type
 
+The extension icon uses a rounded blue tile, a mint starting dot, and a white curved route arrow. Its rounded strokes follow the Lucide icon style used in the popup. The original SVG master is `assets/icon.svg`; antialiased transparent PNG exports at 16, 32, 48, and 128 pixels are committed under `extension/` and copied into builds. No image renderer or remote asset is needed at build time.
+
 | Role | Dark prototype value |
 | --- | --- |
 | Main surface | `#191c22` |

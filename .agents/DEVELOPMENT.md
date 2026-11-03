@@ -15,6 +15,18 @@ bun run build
 Load `dist/extension` for development.
 `dist/design-preview.html` is an offline interactive sample built from the same popup source.
 
+## Icon artwork
+
+Edit `assets/icon.svg`, then regenerate its committed PNG exports with librsvg:
+
+```sh
+for size in 16 32 48 128; do
+  rsvg-convert --width "$size" --height "$size" assets/icon.svg --output "extension/icon-$size.png"
+done
+```
+
+Inspect all four sizes on light and dark backgrounds. Ordinary builds copy the PNG files directly and do not require librsvg.
+
 ## Browser checks
 
 ```sh
