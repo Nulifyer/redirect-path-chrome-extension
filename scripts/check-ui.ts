@@ -51,6 +51,15 @@ try {
   await page.screenshot({ path: 'test-results/default-light.png', fullPage: true });
   await page.getByRole('button', { name: 'Use dark theme', exact: true }).click();
 
+  await page.selectOption('#sample', 'client');
+  assert.deepEqual(await page.locator('.hop .status-badge').allTextContents(), ['HSTS', 'JS', 'META', '200']);
+  assert.equal(await page.locator('.final-result .status-badge').textContent(), '200');
+  await page.getByRole('button', { name: /^Step 3:/ }).click();
+  await page.getByText('Meta refresh · 0s delay', { exact: true }).waitFor();
+  assert.match(await page.locator('.response-label').innerText(), /200/);
+  assert.match(await page.getByRole('button', { name: /^Step 2:/ }).getAttribute('aria-label') ?? '', /JavaScript redirect.*inferred.*HTTP 200/);
+  await page.screenshot({ path: 'test-results/client-badges.png', fullPage: true });
+
   for (const scenario of ['client', 'error', 'network', 'long', 'empty', 'direct', 'redirects']) {
     await page.selectOption('#sample', scenario);
     assert(await page.locator('body').evaluate(el => el.scrollWidth <= window.innerWidth), `${scenario}: no desktop horizontal overflow`);
@@ -73,7 +82,7 @@ try {
   await page.screenshot({ path: 'test-results/narrow-dark.png', fullPage: true });
   assert.deepEqual(externalRequests, [], 'Prototype must make no external requests');
   assert.deepEqual(errors, [], 'Prototype must have no uncaught browser errors');
-  const result = { passed: true, viewports: [640, 360], scenarios: 7, checks: ['desktop default fits one screen', 'step selection', 'header filtering', 'keyboard tabs', 'copy', 'JSON download', 'themes', 'empty and error states', 'long content', 'no horizontal overflow', 'no external network', 'no page errors'] };
+  const result = { passed: true, viewports: [640, 360], scenarios: 7, checks: ['desktop default fits one screen', 'redirect mechanism badges and HTTP details', 'step selection', 'header filtering', 'keyboard tabs', 'copy', 'JSON download', 'themes', 'empty and error states', 'long content', 'no horizontal overflow', 'no external network', 'no page errors'] };
   await writeFile('test-results/ui.json', JSON.stringify(result, null, 2) + '\n');
   console.log(JSON.stringify(result, null, 2));
 } finally {

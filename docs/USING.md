@@ -5,7 +5,7 @@
 Load the URL you want to audit, then click the extension in your browser toolbar.
 The top of the popup shows the final destination, its response status, and the number of redirects.
 
-Read the chain from top to bottom. Each row shows a URL, status code, redirect label, and request time when available.
+Read the chain from top to bottom. Each row shows a URL, a badge identifying its redirect type or response status, and request time when available.
 Select a row to inspect that response. The overview below the chain updates in place.
 Scroll inside the popup when a chain or its details need more room.
 
@@ -19,16 +19,21 @@ For example, search for `location` to find a redirect's destination header, or `
 Clear the filter to see the available headers again.
 Choose **Overview** to return to the response summary.
 
-## Read redirect labels
+## Read the badges
 
-| Label | What it tells you |
+| Badge | What it tells you |
 | --- | --- |
-| Permanent redirect | The server indicates that the URL has moved permanently. |
-| Temporary redirect | The server sends this visit to another URL without marking the move permanent. |
-| Browser HTTPS upgrade | The browser switches to HTTPS before contacting the server for that step. |
-| Meta refresh | The page directs the browser to another URL, sometimes after a delay. |
-| JavaScript redirect · inferred | The navigation appears to be a script-driven redirect. The label does not identify the script. |
-| No network response observed | The page appeared without a response the extension could inspect, such as a history restore. |
+| `301`, `308` | The server indicates that the URL has moved permanently. |
+| `302`, `303`, `307` | The server sends this visit to another URL without marking the move permanent. |
+| `HSTS` | The browser switches to HTTPS before contacting the server for that step. |
+| `META` | The page directs the browser to another URL using a meta refresh. Select the step to see its delay. |
+| `JS` | The navigation appears to be a JavaScript redirect. This is inferred and does not identify the script. |
+| `200` | A successful final response. Other final HTTP status codes appear as received. |
+| `ERR` | The request failed without an HTTP response. Select the step for the error. |
+| `N/A` | No response status was available, such as a history restore. |
+
+Select a step to see its HTTP status and response details. For example, a `META` step can have an HTTP `200` response.
+Hover over a badge for its description.
 
 Request time is time spent on the recorded requests. It is not the full time needed to display the page.
 

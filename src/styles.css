@@ -52,7 +52,7 @@ h1 { font-size: 21px; line-height: 1.3; font-weight: 600; letter-spacing: -.45px
 .destination-path { color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 3px; }
 .final-result { display: flex; gap: 4px; flex-direction: column; align-items: flex-end; flex-shrink: 0; }
 .final-result > span:last-child { font-size: 10px; color: var(--muted); }
-.status-badge { display: inline-flex; justify-content: center; align-items: center; border-radius: 6px; min-width: 39px; padding: 3px 6px; font-size: 12px; font-weight: 650; line-height: 1.45; font-variant-numeric: tabular-nums; }
+.status-badge { display: inline-flex; justify-content: center; align-items: center; border-radius: 6px; width: 46px; flex-shrink: 0; padding: 3px 6px; font-size: 12px; font-weight: 650; line-height: 1.45; font-variant-numeric: tabular-nums; }
 .status-badge.info { background: var(--accent); color: var(--primary); }
 .status-badge.success { background: var(--success-surface); color: var(--success); }
 .status-badge.warning { background: var(--warning-surface); color: var(--warning); }
@@ -74,12 +74,12 @@ h2 { font-size: 12px; font-weight: 600; }
 .step-number { align-self: center; color: var(--muted); width: 10px; font-size: 10px; font-variant-numeric: tabular-nums; }
 .hop-content { display: flex; flex-direction: column; min-width: 0; gap: 2px; flex: 1; }
 .hop-url { display: block; min-width: 0; font-size: 12px; overflow-wrap: anywhere; }
-.hop-label { color: var(--muted); font-size: 10px; }
 .hop-time { color: var(--muted); font-size: 10px; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .row-chevron { color: var(--muted); }
 .details { border-top: 1px solid var(--border); margin-top: 14px; padding-top: 10px; }
 .details-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 9px; }
 .response-label { font-size: 11px; font-weight: 550; }
+.response-kind { display: block; color: var(--muted); font-size: 10px; font-weight: 400; margin-top: 2px; }
 .muted { color: var(--muted); font-weight: 400; }
 .tabs { display: flex; background: var(--secondary); border-radius: 16px; padding: 3px; gap: 2px; }
 .tab { background: transparent; border: none; border-radius: 14px; padding: 4px 10px; color: var(--muted); font-size: 11px; }

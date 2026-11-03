@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import { captures } from '../src/fixtures';
-import { exportCapture, header, hopLabel, summarize, tone } from '../src/model';
+import { exportCapture, header, hopBadge, hopDescription, hopLabel, summarize, tone } from '../src/model';
 
 describe('capture presentation', () => {
   test('counts redirects separately from the final response and totals measured requests', () => {
@@ -25,6 +25,16 @@ describe('capture presentation', () => {
     expect(hopLabel(capture.hops[0])).toBe('Browser HTTPS upgrade');
     expect(hopLabel(capture.hops[1])).toContain('inferred');
     expect(header(capture.hops[0], 'Location')).toBe('https://example.com/account');
+  });
+  test('badges identify the redirect mechanism while descriptions retain HTTP evidence', () => {
+    const client = captures.find(c => c.id === 'client')!;
+    expect(client.hops.map(hopBadge)).toEqual(['HSTS', 'JS', 'META', '200']);
+    expect(captures[0].hops.map(hopBadge)).toEqual(['301', '302', '200']);
+    expect(hopDescription(client.hops[1])).toBe('JavaScript redirect · inferred · HTTP 200');
+    expect(hopDescription(client.hops[2])).toBe('Meta refresh · 0s delay · HTTP 200');
+    expect(hopBadge(captures.find(c => c.id === 'network')!.hops[0])).toBe('ERR');
+    expect(hopBadge(captures.find(c => c.id === 'error')!.hops.at(-1)!)).toBe('404');
+    expect(hopBadge({ ...client.hops[3], status: null })).toBe('N/A');
   });
   test('exports structured evidence with an explicit sample marker', () => {
     const exported = JSON.parse(exportCapture(captures[0]));

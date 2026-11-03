@@ -4,14 +4,14 @@ import { Button as BaseButton } from '@base-ui/react/button';
 import { Tabs } from '@base-ui/react/tabs';
 import { ArrowDown, ArrowDownToLine, Check, ChevronRight, Clipboard, FileSearch, Globe2, Moon, Search, ShieldCheck, Sun, Pause, Play, Trash2 } from 'lucide-react';
 import { captures } from './fixtures';
-import { copySummary, exportCapture, header, hopLabel, summarize, tone, type Hop, type Capture } from './model';
+import { copySummary, exportCapture, header, hopBadge, hopDescription, hopLabel, summarize, tone, type Hop, type Capture } from './model';
 
 function Button({ children, onClick, title, disabled, primary = false }: { children: ReactNode; onClick?: () => void; title?: string; disabled?: boolean; primary?: boolean }) {
   return <BaseButton className={`button ${primary ? 'tonal' : ''}`} onClick={onClick} title={title} aria-label={title} disabled={disabled}>{children}</BaseButton>;
 }
 
-function Badge({ hop }: { hop: Hop }) {
-  return <span className={`status-badge ${tone(hop)}`}>{hop.status ?? (hop.kind === 'error' ? 'ERR' : 'N/A')}</span>;
+function Badge({ hop, response = false }: { hop: Hop; response?: boolean }) {
+  return <span className={`status-badge ${tone(hop)}`} title={hopDescription(hop)}>{response ? hop.status ?? (hop.kind === 'error' ? 'ERR' : 'N/A') : hopBadge(hop)}</span>;
 }
 
 function App({ live = false }: { live?: boolean }) {
@@ -113,7 +113,7 @@ function App({ live = false }: { live?: boolean }) {
           <h1>{finalUrl?.hostname ?? (loading ? 'Loading capture' : 'Waiting for a page')}</h1>
           <div className="destination-path" title={summary.last?.url}>{finalUrl ? finalUrl.pathname + finalUrl.search : 'The next page load starts a capture.'}</div>
         </div>
-        {summary.last && <div className="final-result"><Badge hop={summary.last} /><span>{summary.hasError ? 'Failed' : 'Final response'}</span></div>}
+        {summary.last && <div className="final-result"><Badge hop={summary.last} response /><span>{summary.hasError ? 'Failed' : 'Final response'}</span></div>}
       </div>
 
       {selected ? <>
@@ -127,10 +127,10 @@ function App({ live = false }: { live?: boolean }) {
           <section className="chain-section" aria-labelledby="chain-heading">
             <div className="section-heading"><h2 id="chain-heading">Redirect chain</h2><span>Select a step to inspect</span></div>
             <div className="chain" role="group" aria-label="Redirect steps">
-              {capture.hops.map((hop, index) => <button key={`${index}-${hop.url}`} type="button" className={`hop ${index === actualIndex ? 'selected' : ''}`} aria-pressed={index === actualIndex} aria-label={`Step ${index + 1}: ${hop.status ?? 'unavailable'} ${hop.url}`} onClick={() => { setSelectedIndex(index); setSelectedKey(`${hop.requestId}-${hop.url}`); setFilter(''); }}>
+              {capture.hops.map((hop, index) => <button key={`${index}-${hop.url}`} type="button" className={`hop ${index === actualIndex ? 'selected' : ''}`} aria-pressed={index === actualIndex} aria-label={`Step ${index + 1}: ${hopDescription(hop)} ${hop.url}`} onClick={() => { setSelectedIndex(index); setSelectedKey(`${hop.requestId}-${hop.url}`); setFilter(''); }}>
                 <span className="step-number">{index + 1}</span>
                 <Badge hop={hop} />
-                <span className="hop-content"><span className="hop-url" title={hop.url}>{hop.url}</span><span className="hop-label">{hopLabel(hop)}</span></span>
+                <span className="hop-content"><span className="hop-url" title={hop.url}>{hop.url}</span></span>
                 <span className="hop-time">{hop.durationMs === null ? 'N/A' : `${hop.durationMs} ms`}</span>
                 <ChevronRight size={14} className="row-chevron" />
               </button>)}
@@ -140,7 +140,7 @@ function App({ live = false }: { live?: boolean }) {
           <section className="details" aria-label="Selected response">
             <Tabs.Root value={detailsTab} onValueChange={value => setDetailsTab(String(value))}>
               <div className="details-toolbar">
-                <span className="response-label">Step {actualIndex + 1} <span className="muted">/ {selected.status ?? 'No response'}</span></span>
+                <span className="response-label">Step {actualIndex + 1} <span className="muted">/ {selected.status === null ? 'No HTTP response' : `HTTP ${selected.status}`}</span><span className="response-kind">{hopLabel(selected)}</span></span>
                 <Tabs.List className="tabs" aria-label="Response details">
                   <Tabs.Tab className="tab" value="overview">Overview</Tabs.Tab>
                   <Tabs.Tab className="tab" value="headers">Headers <span>{selected.headers.length}</span></Tabs.Tab>

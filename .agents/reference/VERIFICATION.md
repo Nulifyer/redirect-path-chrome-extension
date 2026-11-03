@@ -1,5 +1,16 @@
 # Verification
 
+## Redirect mechanism badges
+
+On 2026-11-03, chain badges were changed to JS, META, HSTS, or the HTTP response code. Redundant per-row descriptions moved to the selected response heading; that heading and badge tooltips retain the HTTP status, meta delay, and JavaScript inference distinction.
+
+Type checking and 19 unit tests passed. Seven-scenario UI checks passed at 640px and 360px, including mechanism badges, preserved final HTTP status, accessible JavaScript inference, and selected meta delay. Dark/light/narrow and client-badge screenshots were inspected. The default three-step sample still fits one screen.
+The real-extension browser suite passed its controlled HTTP, JavaScript, meta, HSTS, error, lifecycle, popup, copy/export, and privacy checks.
+
+The public URLs requested by the user were opened in the shared preview browser. Google reached www.google.com. The exact supplied YouTube link returned a 200 confirmation page with a Go To Site action and no meta refresh. Following that action reached go.lowlevel.tv/wizcode and then www.wiz.io/demo. This public-site observation verifies the destinations and confirmation behavior; redirect classification is covered by the isolated extension fixtures, not by this shared-browser observation. No signed link tokens were added to source or docs.
+
+Ignored evidence includes test-results/client-badges.png, ui.json, and extension.json. Release publication evidence follows after tagged-package validation.
+
 ## Documentation audience update
 
 The README introduces product benefits and getting started. All seven files in `docs/` are end-user guides or their index.

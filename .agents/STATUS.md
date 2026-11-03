@@ -2,7 +2,7 @@
 
 Updated: 2026-11-03
 Owner: primary agent
-State: implemented, verified, and published
+State: badge update verified locally; release preparation in progress
 
 ## Project state
 
@@ -16,16 +16,15 @@ The README now introduces the product; `docs/` contains end-user guides and exam
 
 ## Current batch
 
-No active implementation batch. Delivery evidence is recorded in `.agents/reference/VERIFICATION.md`.
+Show redirect mechanisms directly in each chain badge: JS, META, HSTS, or the HTTP code. Remove repeated row subtitles and retain the full description and HTTP status in selected-step details. Prepare v0.1.2 through the established release workflow.
 
 ## In progress
 
-No running implementation or delegated task.
+Final package validation and GitHub delivery. No delegated tasks.
 
 ## Next action
 
-Respond to the user's installation or feature feedback. Discuss Chrome Web Store publication and release automation only when requested.
-For another release, increase both version owners, commit, tag, and dispatch the documented draft-release workflow.
+Commit the inspected badge update, tag v0.1.2, dispatch the draft-release workflow, and verify the downloaded draft before publication.
 
 ## Blockers
 

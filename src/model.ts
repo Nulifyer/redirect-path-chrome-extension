@@ -34,6 +34,17 @@ export function hopLabel(hop: Hop): string {
   return hop.status === 301 || hop.status === 308 ? 'Permanent redirect' : 'Temporary redirect';
 }
 
+export function hopBadge(hop: Hop): string {
+  if (hop.kind === 'javascript') return 'JS';
+  if (hop.kind === 'meta') return 'META';
+  if (hop.kind === 'hsts') return 'HSTS';
+  return String(hop.status ?? (hop.kind === 'error' ? 'ERR' : 'N/A'));
+}
+
+export function hopDescription(hop: Hop): string {
+  return `${hopLabel(hop)} · ${hop.status === null ? 'No HTTP response' : `HTTP ${hop.status}`}`;
+}
+
 export function tone(hop: Hop): 'success' | 'warning' | 'info' | 'error' {
   if (hop.kind === 'error' || (hop.status !== null && hop.status >= 400)) return 'error';
   if (hop.kind === 'final') return hop.status === null ? 'info' : 'success';

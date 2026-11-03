@@ -24,7 +24,7 @@ export const captures: Capture[] = [
   { id: 'client', label: 'HSTS + client redirects', complete: true, hops: [
     { url: 'http://example.com/account', status: 307, kind: 'hsts', durationMs: 0, ip: null, headers: headers({ location: 'https://example.com/account', 'non-authoritative-reason': 'HSTS' }) },
     { url: 'https://example.com/account', status: 200, kind: 'javascript', durationMs: 116, ip: '192.0.2.10', headers: headers({ 'content-type': 'text/html', server: 'nginx' }) },
-    { url: 'https://example.com/login', status: 200, kind: 'meta', durationMs: 42, ip: '192.0.2.10', headers: headers({ 'content-type': 'text/html', server: 'nginx' }) },
+    { url: 'https://example.com/login', status: 200, kind: 'meta', metaDelaySeconds: 0, durationMs: 42, ip: '192.0.2.10', headers: headers({ 'content-type': 'text/html', server: 'nginx' }) },
     { url: 'https://example.com/sign-in', status: 200, kind: 'final', durationMs: 148, ip: '192.0.2.20', headers: finalHeaders },
   ] },
   { id: 'error', label: 'HTTP error', complete: true, hops: [
