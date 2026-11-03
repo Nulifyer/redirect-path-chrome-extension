@@ -1,71 +1,40 @@
 # Redirect Inspector
 
-A Chrome extension for debugging redirects and auditing HTTP responses.
-It records the actual page navigation automatically and keeps captures in browser session memory.
-The popup shows the final status, redirect count, chain, and the selected response's headers and server IP.
+### See where a page takes you.
 
-## Install
+A URL can take several detours before a page appears. Redirect Inspector shows the redirects, status codes, and final destination in one compact popup.
 
-Download the installation ZIP from [GitHub Releases](https://github.com/Nulifyer/redirect-path-chrome-extension/releases).
-Extract it into a permanent folder, open `chrome://extensions` or `brave://extensions`, enable Developer mode, and choose Load unpacked.
-Select the folder containing `manifest.json`. Pin the extension and reload a webpage.
+Load a page, click the extension, and follow the chain. Spot an unnecessary redirect, find a broken destination, or check that a site migration lands where it should.
 
-[Installation and updates](docs/INSTALL.md) includes the optional Linux update helper.
-GitHub ZIP installations update when you run the helper and reload the extension. There are no silent update checks.
-Web Store publication is deferred.
+[Get Redirect Inspector](https://github.com/Nulifyer/redirect-path-chrome-extension/releases/latest) · [Installation guide](docs/INSTALL.md) · [See examples](docs/EXAMPLES.md)
 
-## Features
+## Get the answer at a glance
 
-- Automatic main-frame capture of HTTP redirects, final responses, and network failures.
-- Server redirects, browser HSTS upgrades, observed meta refresh, and inferred JavaScript redirects.
-- Per-step status, URL, request timing, available response headers, server IP, and cache indication.
-- One-screen overview for ordinary chains, with scrolling for long evidence.
-- Header filtering, copy, JSON export, pause/resume, clear, and saved light/dark theme.
-- Redacted exports by default, with explicit full-value export.
-- Session-only captures, explicit tab-close deletion, no external analysis, telemetry, remote assets, or update tabs.
+See the final response and redirect count first. Follow each step in order, then select a response to inspect its headers, server IP, cache information, and request time.
 
-JavaScript classification is an inference from browser navigation and recent user-interaction signals.
-The extension does not identify the responsible script. History restores can lack a network response.
-Captures have documented size limits. Incognito is disabled in this version.
-See [privacy](docs/PRIVACY.md) and the [implementation map](docs/IMPLEMENTATION-MAP.md).
+HTTP redirects, browser HTTPS upgrades, meta refreshes, and inferred JavaScript redirects have distinct labels. Failed responses and network errors stay visible in the chain.
 
-## Build and check
+## Made for everyday audits
 
-Requires Bun, Python 3.9+, and OpenSSL for browser fixtures.
+- Check that old URLs reach the right new pages.
+- Find redirect chains that could take a shorter route.
+- Investigate unexpected login redirects, missing pages, and redirect loops.
+- Filter response headers to find the detail you need.
+- Copy a readable summary or export a JSON capture for a bug report.
 
-```sh
-bun install --frozen-lockfile
-bun run typecheck
-bun test
-bun run test:updater
-bun run build
-```
+Automatic recording means the chain is ready when you open the popup. Pause recording when needed, clear a capture, and choose a light or dark theme.
 
-Load `dist/extension` for local development. For browser checks:
+## Keep your browsing yours
 
-```sh
-bunx playwright install chromium
-bun run test:ui
-bun run test:browser
-```
+Captures stay in your browser for the current session. Closing a tab deletes its capture.
+There are no analytics, AI uploads, or promotional links.
 
-Set `CHROME_BIN=/path/to/chromium` to use an existing compatible browser.
-Tests use an isolated profile and local HTTP/TLS fixtures. They do not modify your browser profile.
+Copy and export redact query values and sensitive headers by default. Choose full values when an audit needs them, and review the result before sharing.
 
-```sh
-bun run package
-```
+[Read the privacy guide](docs/PRIVACY.md)
 
-This builds `dist/release/redirect-inspector-VERSION-chromium.zip`, checksums, provenance, and the update helper.
-Local uncommitted builds have `dirty: true` and are previews. Tagged releases require clean source.
-[Release instructions](docs/DISTRIBUTION.md) describe the manually dispatched draft-release workflow.
+## Start inspecting
 
-`dist/design-preview.html` is an offline interactive design preview with synthetic captures, built from the same popup source.
+Download the latest release, extract it to a permanent folder, and load it through Developer mode in Chrome or Brave. Pin Redirect Inspector and reload a webpage.
 
-## Project background
-
-The [privacy investigation](docs/PRIVACY-AUDIT.md) covers Ayima Redirect Path 4.0.0.
-This project is an independent implementation under the MIT license.
-Ayima code, images, and branding are not included in source or release packages.
-The UI uses Base UI and Lucide, with [T3 Code and Material 3 references](docs/DESIGN.md).
-Third-party license notices accompany the release ZIP.
+[Install in a few steps](docs/INSTALL.md) · [Use the popup](docs/USING.md) · [Keep it updated](docs/UPDATING.md) · [Get help](docs/TROUBLESHOOTING.md)

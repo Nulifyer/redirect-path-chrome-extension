@@ -11,7 +11,7 @@ The user confirmed that every page load should start recording automatically.
 - The inspected store artifact and consequential privacy findings have reproducible evidence.
 - The proposed interface shows final status, redirects, chain, and selected response details in one ordinary popup screen.
 - Base UI, T3 Code, and Material 3 references guide the design.
-- Live capture records real navigations automatically and passes the browser acceptance cases in `docs/IMPLEMENTATION-MAP.md`.
+- Live capture records real navigations automatically and passes the browser acceptance cases in `.agents/reference/IMPLEMENTATION-MAP.md`.
 - Reviewed original source is published to GitHub with installable ZIPs and a manual update helper following Dark Reader.
 - The user can install, update, reload, and audit the exact released package.
 

@@ -1,5 +1,12 @@
 # Verification
 
+## Documentation audience update
+
+The README introduces product benefits and getting started. All seven files in `docs/` are end-user guides or their index.
+Engineering references moved to `.agents/reference/`; local build instructions moved to `.agents/DEVELOPMENT.md`.
+Checked 25 local Markdown links, the standalone links in the packaged installation/privacy guides, documentation-audience boundaries, whitespace, and project-record structure.
+No application source or release artifact changed, so application/browser tests were not repeated.
+
 ## Live extension milestone
 
 Verified locally on 2026-11-03 with Bun 1.4.3, TypeScript 5.9.3, Playwright 1.64.1, and Chrome for Testing 156.0.8078.4 on Linux.

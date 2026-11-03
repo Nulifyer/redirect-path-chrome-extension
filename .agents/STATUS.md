@@ -11,10 +11,11 @@ Source is published at https://github.com/Nulifyer/redirect-path-chrome-extensio
 The first public release is v0.1.1, built from source commit `5f0732c52b32866a0b0331829b25ed781ffe9391`.
 The exact installable package remains at `dist/release/extension`, with the ZIP and updater alongside it.
 The user's browser profile was not modified.
+The README now introduces the product; `docs/` contains end-user guides and examples. Engineering references are under `.agents/reference/`, with build instructions in `.agents/DEVELOPMENT.md`.
 
 ## Current batch
 
-No active implementation batch. Delivery evidence is recorded in `docs/VERIFICATION.md`.
+No active implementation batch. Delivery evidence is recorded in `.agents/reference/VERIFICATION.md`.
 
 ## In progress
 
@@ -34,4 +35,5 @@ None for GitHub installation. Web Store publication is intentionally deferred.
 Local checks, hosted source checks, and the hosted tagged-release workflow passed.
 The public ZIP checksum, all 15 package files, release metadata, and helper matched the local tagged source build.
 The actual public helper passed first install and same-directory replacement. A real Chromium extension Reload preserved identity and preferences and cleared session capture data.
-See `docs/VERIFICATION.md` for exact URLs, methods, results, and limits.
+README/user-guide links, standalone packaged-guide links, documentation audiences, whitespace, and project-record structure were checked after the documentation reorganization.
+See `.agents/reference/VERIFICATION.md` for exact URLs, methods, results, and limits.

@@ -13,7 +13,7 @@ Read the repository-root `AGENTS.md` first, then use this order:
 - Keep these files short and current. Git owns history.
 - Replace stale status. Do not append a chronological diary.
 - Put choices future work must preserve in `DECISIONS.md`, never task completion.
-- Put stable discoveries and facts under the repository's documentation convention, usually `docs/`.
+- Keep engineering references and research under `.agents/reference/`. Reserve `docs/` for end-user guides.
 - Keep exact run results in contracts or evidence artifacts, not `STATUS.md` or `TESTING.md`.
 - Preserve user-added sections and notes.
 - Resolve structural errors in records required for the current work.
@@ -25,3 +25,12 @@ Read the repository-root `AGENTS.md` first, then use this order:
 ## Delivery loop
 
 Address one logical result, update its owning records, and run affected checks. When commits are authorized, inspect and stage only that batch, then commit it. Otherwise record the verified uncommitted result and continue within existing authority. Distinguish returned work, verified task output, integration, and project acceptance.
+
+## Engineering references
+
+- [Development](DEVELOPMENT.md) for local builds and checks.
+- [Implementation map](reference/IMPLEMENTATION-MAP.md) for capture behavior and source ownership.
+- [Design](reference/DESIGN.md) for UI references and choices.
+- [Release engineering](reference/DISTRIBUTION.md) for packaging and GitHub workflows.
+- [Verification](reference/VERIFICATION.md) for observed delivery evidence.
+- [Original-extension audit](reference/PRIVACY-AUDIT.md) for the historical investigation.

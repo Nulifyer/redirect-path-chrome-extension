@@ -1,54 +1,33 @@
 # Install Redirect Inspector
 
-Redirect Inspector records the current tab's page redirects automatically.
-Captures stay in browser session memory. Closing a tab deletes its capture.
-There are no external analysis services, telemetry, or automatic update connections.
+Install the extension in Chrome or Brave on your desktop. Keep the extracted folder in a permanent location.
 
-## First installation
+## Download and install
 
-1. Download `redirect-inspector-VERSION-chromium.zip` from the project's GitHub release.
-2. Extract it into a permanent directory. The directory must contain `manifest.json`.
-3. Open `chrome://extensions` or `brave://extensions` and enable Developer mode.
-4. Choose Load unpacked and select the extracted directory.
-5. Pin the extension, then load or reload the webpage you want to inspect.
+1. Open [the latest release](https://github.com/Nulifyer/redirect-path-chrome-extension/releases/latest).
+2. Download the file named `redirect-inspector-VERSION-chromium.zip`. Choose the extension ZIP rather than GitHub's source-code download.
+3. Extract the ZIP into a folder you will keep, such as `Extensions/redirect-inspector`.
+4. Open `chrome://extensions` in Chrome or `brave://extensions` in Brave.
+5. Turn on **Developer mode**.
+6. Choose **Load unpacked** and select the extracted folder containing `manifest.json`.
+7. Pin Redirect Inspector using your browser's extensions menu.
 
-Click the extension icon to see the recorded chain. Select a step for its response details.
-Use Headers to inspect or filter the available response headers.
-Pause stops recording across tabs. Resume applies to new navigations.
-Clear deletes the current tab's capture.
+Leave Developer mode enabled and keep the extracted folder in place.
+If your browser is managed by an organization, its settings may prevent this installation method.
 
-Copy and export redact URL query values, credentials, fragments, and sensitive header names by default.
-The checkbox for full values disables export redaction for that popup session.
-Hostnames, paths, and ordinary header values can still contain private information. Review exports before sharing.
-Some authentication and cookie response headers are never retained, even in a full export.
+## Record your first page
 
-## Manual updates
+1. Open or reload an HTTP or HTTPS webpage.
+2. Wait for it to load, then click Redirect Inspector in the toolbar.
+3. Read the final status and redirect count at the top.
+4. Select a step to inspect that response's details.
 
-Replace the installed directory's files with the next release, using the same path.
-Remove the old files first so deleted files do not remain. Do not uninstall the browser entry.
-Click Reload on the extension's browser card, then refresh the webpage.
-Keeping the same directory and manifest key preserves the extension identity and preferences.
+Recording starts when a page loads. A page that was already open before installation needs a reload.
+Browser settings pages cannot be captured. Incognito is unavailable in this version.
 
-## Linux update helper
+## Keep it updated
 
-The standalone helper requires Python 3.9 or newer. It runs only when you invoke it.
+Follow [the update guide](https://github.com/Nulifyer/redirect-path-chrome-extension/blob/main/docs/UPDATING.md) when a new release is available.
 
-```sh
-python3 update-redirect-inspector.py --check
-python3 update-redirect-inspector.py
-```
-
-It checks GitHub Releases, verifies the ZIP checksum and release metadata, and atomically replaces the installation.
-Validation failure leaves installed files intact. Replacement failure restores the prior installation.
-The default directory is `${XDG_DATA_HOME:-$HOME/.local/share}/chrome-extensions/nulifyer-redirect-inspector`.
-Use `--directory /path/to/extension` to select an existing packaged installation.
-The helper prints the folder for Load unpacked or Reload. It does not edit the browser profile or reload Chrome.
-
-Each release includes `SHA256SUMS`. With the ZIP in the same directory, verify it with:
-
-```sh
-sha256sum --check SHA256SUMS
-```
-
-The checksum detects corruption. It is not an independent publisher signature.
-GitHub ZIP installations do not update silently. Web Store distribution is separate future work.
+For a walkthrough, see [using the popup](https://github.com/Nulifyer/redirect-path-chrome-extension/blob/main/docs/USING.md).
+If no capture appears, see [troubleshooting](https://github.com/Nulifyer/redirect-path-chrome-extension/blob/main/docs/TROUBLESHOOTING.md).

@@ -6,7 +6,7 @@ Type checks verify TypeScript consistency. Unit tests cover normalized capture e
 The browser check loads the built extension in an isolated Chromium profile and exercises real local HTTP/TLS navigations.
 The UI check opens the offline sample file for layout, keyboard, theme, and sample-state checks.
 Updater tests verify installation, archive validation, checksum failures, rollback, locking constraints, check-only behavior, and downgrade rejection.
-Exact completed checks and limitations belong in `docs/VERIFICATION.md`.
+Exact completed checks and limitations belong in `.agents/reference/VERIFICATION.md`.
 
 ## Fast checks
 

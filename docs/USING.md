@@ -1,0 +1,56 @@
+# Use Redirect Inspector
+
+## Follow a redirect chain
+
+Load the URL you want to audit, then click the extension in your browser toolbar.
+The top of the popup shows the final destination, its response status, and the number of redirects.
+
+Read the chain from top to bottom. Each row shows a URL, status code, redirect label, and request time when available.
+Select a row to inspect that response. The overview below the chain updates in place.
+Scroll inside the popup when a chain or its details need more room.
+
+## Find a response header
+
+1. Select the step you want to inspect.
+2. Choose **Headers**.
+3. Type part of a header name or value into **Filter headers**.
+
+For example, search for `location` to find a redirect's destination header, or `cache-control` to inspect caching instructions.
+Clear the filter to see the available headers again.
+Choose **Overview** to return to the response summary.
+
+## Read redirect labels
+
+| Label | What it tells you |
+| --- | --- |
+| Permanent redirect | The server indicates that the URL has moved permanently. |
+| Temporary redirect | The server sends this visit to another URL without marking the move permanent. |
+| Browser HTTPS upgrade | The browser switches to HTTPS before contacting the server for that step. |
+| Meta refresh | The page directs the browser to another URL, sometimes after a delay. |
+| JavaScript redirect · inferred | The navigation appears to be a script-driven redirect. The label does not identify the script. |
+| No network response observed | The page appeared without a response the extension could inspect, such as a history restore. |
+
+Request time is time spent on the recorded requests. It is not the full time needed to display the page.
+
+## Copy or save a capture
+
+Choose **Copy chain** for a readable summary, or the download button for a JSON file.
+
+By default, exports hide URL query values, URL credentials, fragments, and sensitive header values.
+Leave **Include full values in copy and export** unchecked when you do not need those values.
+If a private audit requires exact values, check it before copying or exporting. The choice resets when you reopen the popup.
+
+Hostnames, URL paths, and ordinary header values can still contain private information. Review a capture before sharing it.
+
+## Pause or clear recording
+
+Use **Pause recording** to stop new recording across tabs. Existing captures remain available.
+Choose **Resume recording**, then reload the page to start a new audit.
+
+Use **Clear capture** to delete the current tab's capture. Reload the page when you want to record it again.
+
+## Change the theme
+
+Use the sun or moon button to switch between light and dark themes. Your choice is remembered.
+
+Continue with [audit examples](EXAMPLES.md) or [troubleshooting](TROUBLESHOOTING.md).
