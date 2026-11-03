@@ -38,7 +38,29 @@ JavaScript classification remains an inference. Delayed user-triggered scripts a
 No Web Store submission or incognito behavior was tested. The original Ayima extension was not installed in a live browser.
 
 Ignored exact local artifacts include `test-results/extension.json`, `ui.json`, `live-popup.png`, and the offline screenshots.
-Hosted checks and public asset verification are separate delivery evidence and must be reported only after they run.
+## Published release evidence
+
+[Release v0.1.1](https://github.com/Nulifyer/redirect-path-chrome-extension/releases/tag/v0.1.1)
+was built from source commit `5f0732c52b32866a0b0331829b25ed781ffe9391`.
+The [hosted source checks](https://github.com/Nulifyer/redirect-path-chrome-extension/actions/runs/41685208513)
+and [tagged release workflow](https://github.com/Nulifyer/redirect-path-chrome-extension/actions/runs/41685216895) both passed.
+The first v0.1.0 workflow attempt did not produce a release. The v0.1.1 CI fix explicitly clears a runner browser override so extension checks use bundled Chromium.
+
+The downloaded public ZIP checksum is
+`ce1f16808b0649fb897a161ca8314f08f450856413a7c30f072f45cf4332ddc3`.
+All 15 installation files matched the local tagged build, and the downloaded helper matched its committed source.
+A repeated local tagged build produced the same checksum.
+
+The actual public helper was run without GitHub authentication against the published assets in a disposable directory.
+Its check-only mode created no installation. First install passed checksum and metadata validation.
+A second update atomically replaced the same directory and removed a deliberately added stale file.
+The public package was loaded in real Chromium with Developer mode enabled, matching the installation instructions.
+Reload through Chrome's extension manager preserved ID `pgajamhminmmpoiigiijboahplbpebjc`, theme, and pause preferences.
+The previous session marker disappeared after Reload.
+No user browser profile or permanent installation was changed.
+
+Ignored evidence is in `test-results/hosted-release/verification.json` and `test-results/published-release.json`.
+The downloaded GitHub assets are retained under `test-results/hosted-release/` for inspection.
 
 ## Historical privacy audit
 

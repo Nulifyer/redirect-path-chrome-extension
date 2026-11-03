@@ -28,6 +28,7 @@ EXTENSION_DIR=dist/release/extension bun run test:browser
 
 Set `CHROME_BIN` to an existing compatible full Chromium executable if needed.
 The extension test uses Playwright's Chromium channel, not the extension-free headless shell.
+Hosted extension checks explicitly clear CHROME_BIN to avoid an inherited runner browser override.
 It requires Python 3.9+ and OpenSSL. Temporary profiles and fixture certificates are removed after the run.
 No user browser profile is used. The HSTS fixture maps a preloaded .dev hostname to 127.0.0.1 and trusts only that fixture certificate's SPKI.
 Browser screenshots and structured evidence go under ignored `test-results/`.

@@ -2,32 +2,36 @@
 
 Updated: 2026-11-03
 Owner: primary agent
-State: live implementation and release verification
+State: implemented, verified, and published
 
 ## Project state
 
-The user accepted proceeding with the design by saying "go make this".
-A working MV3 capture engine and live popup now exist, along with an installable package builder, Linux updater, and GitHub workflows.
-The source remains uncommitted while verification and documentation are finalized.
+The live MV3 extension, compact popup, GitHub workflows, package builder, Linux updater, privacy policy, and investigation docs are complete.
+Source is published at https://github.com/Nulifyer/redirect-path-chrome-extension.
+The first public release is v0.1.1, built from source commit `5f0732c52b32866a0b0331829b25ed781ffe9391`.
+The exact installable package remains at `dist/release/extension`, with the ZIP and updater alongside it.
+The user's browser profile was not modified.
 
 ## Current batch
 
-Finish worker-lifetime and package install/update verification, then publish original source to GitHub.
+No active implementation batch. Delivery evidence is recorded in `docs/VERIFICATION.md`.
 
 ## In progress
 
-Primary agent owns integration, checks, publication, and current project records.
-No delegated work is running.
+No running implementation or delegated task.
 
 ## Next action
 
-Complete the remaining lifecycle checks, update exact verification evidence, inspect the source delivery, and publish the repository and first GitHub package.
+Respond to the user's installation or feature feedback. Discuss Chrome Web Store publication and release automation only when requested.
+For another release, increase both version owners, commit, tag, and dispatch the documented draft-release workflow.
 
 ## Blockers
 
-No external dependency blocker. Web Store automation is intentionally deferred.
+None for GitHub installation. Web Store publication is intentionally deferred.
 
 ## Verification
 
-Real-browser checks passed HTTP redirect chains, client redirects, user-navigation boundaries, errors, cache, HSTS, concurrent tabs, explicit session-key deletion, and live popup controls and exports.
-Worker restart and packaged installation lifecycle verification are still in progress.
+Local checks, hosted source checks, and the hosted tagged-release workflow passed.
+The public ZIP checksum, all 15 package files, release metadata, and helper matched the local tagged source build.
+The actual public helper passed first install and same-directory replacement. A real Chromium extension Reload preserved identity and preferences and cleared session capture data.
+See `docs/VERIFICATION.md` for exact URLs, methods, results, and limits.

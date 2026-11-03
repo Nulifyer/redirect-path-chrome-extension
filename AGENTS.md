@@ -8,7 +8,7 @@
 - Keep captured navigation evidence local and session-only. No AI endpoint, telemetry, promotional links, remote assets, or unsolicited tabs.
 - Use Base UI controls and the T3 Code / Material 3 direction recorded in `docs/DESIGN.md`.
 - The live extension must use actual captured navigation evidence. Keep the offline sample preview clearly identified.
-- Follow the Dark Reader personal GitHub ZIP and manual helper pattern when implementing releases. Web Store automation is deferred.
+- Keep the stable manifest public key and same-directory update behavior. Follow the Dark Reader GitHub ZIP and manual helper pattern. Web Store automation is deferred.
 - Exclude `research/artifacts/` and downloaded reference source from Git and release packages.
 
 ## Project continuity
