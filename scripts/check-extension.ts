@@ -44,6 +44,7 @@ const workerErrors: string[] = [];
 const external: string[] = [];
 
 async function boot() {
+  console.log(`Extension test browser: ${executablePath || chromium.executablePath()}`);
   context = await launch();
   context.on('console', message => { if (message.type() === 'error' && message.location().url.startsWith('chrome-extension://')) workerErrors.push(message.text()); });
   context.on('request', request => {

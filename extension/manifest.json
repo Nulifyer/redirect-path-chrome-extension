@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Redirect Inspector",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Inspect page redirects, HTTP status codes, response headers and server IPs. All captures stay in your browser session.",
   "minimum_chrome_version": "120",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjDh132yepC/3RWPgJPIPEwr9MxkMJdsoH9mw7LYKOeIp4VClnvungKTtKEkS82O3RHF4vfTDk87sTmaKiNxwtqxWUbGxdUIxOStdAIrz4tz1w/EbZNPDZpIRA6Kyg+rxH4ne/cGnDZjTVn1asi2JplXDCbUAjpbB5UVmDkAL9pJDHqu1dBjDVVORsgY7szD6jK6p7XS47BHbL8em//ofm2DtqVrL01uhdpE0eX9ahL9MRU76yE/iJGpNKmlU1qlT0z2eQqEedHPLlYcrzAiyreJGzU57LzzhnuSDOt+vzR4qa9hepF4ots0Z0TbYvVIfj5hnZVKj+awyQSovsZwN7wIDAQAB",
