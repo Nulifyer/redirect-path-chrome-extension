@@ -42,7 +42,7 @@ The live dark popup and offline dark/light/narrow screenshots were inspected for
 This is not a full accessibility audit or an exhaustive compatibility audit of public sites and Chromium derivatives.
 
 JavaScript classification remains an inference. Delayed user-triggered scripts and unrelated recent gestures can be ambiguous.
-No Web Store submission or incognito behavior was tested. The original Ayima extension was not installed in a live browser.
+No Web Store submission or incognito behavior was tested.
 
 Ignored exact local artifacts include `test-results/extension.json`, `ui.json`, `live-popup.png`, and the offline screenshots.
 ## Published release evidence
@@ -68,10 +68,3 @@ No user browser profile or permanent installation was changed.
 
 Ignored evidence is in `test-results/hosted-release/verification.json` and `test-results/published-release.json`.
 The downloaded GitHub assets are retained under `test-results/hosted-release/` for inspection.
-
-## Historical privacy audit
-
-The downloaded Redirect Path 4.0.0 CRX identity and source locators are in `PRIVACY-AUDIT.md`.
-The retention reproduction checked both the CRX hash and extracted background-script hash before running the script with mocked browser APIs.
-It found the closed tab absent from memory and still present in mocked session storage.
-That reproduction supports the code finding under documented merge semantics. It does not establish full runtime parity.

@@ -1,39 +1,23 @@
 # Behavior and implementation map
 
-## Existing extension
-
-| Part | Entry points | Responsibility |
-| --- | --- | --- |
-| MV3 worker, `background.js` | Main-frame webRequest redirect/completion, webNavigation commit | Assemble paths and classify responses |
-| Content script, `metaRefreshDetect.js` | DOM ready and click | Report meta refresh and distinguish user interaction |
-| Session cache | Worker startup and per-tab writes | Preserve paths across worker suspension |
-| Toolbar action | Updated after a recorded response | Show the highest-priority status, JS, or Meta badge |
-| Popup, `popup.js` | Active-tab query and worker message | Display chain, available response headers, IP, and copy action |
-| Optional AI action | User click | Upload stored capture and open remote analysis |
-| Update handler | Extension version update | Open vendor release notes once per version |
-
-Observed execution is navigation event, per-tab evidence, event correlation, path classification, badge, popup request, and render.
-Server redirects contain status and target evidence. Client classification correlates browser transition signals, previous-page metadata, and clicks.
-The popup expands one response's headers at a time. It includes HSTS explanation and response-specific error text.
-
-## Confirmed replacement requirements
+## Product requirements
 
 The user described the tool as a debugging and auditing extension.
 Loading a page must start recording automatically. Opening the popup must show the resulting redirect chain.
 Capture must span intermediate HTTP redirects and relevant client navigations.
-The new interface must remove vendor branding, promotions, and unrelated actions.
+The interface focuses on audit results and omits promotions and unrelated actions.
 It must expose the important facts in one popup screen for ordinary chains.
 Long chains and large header sets may scroll inside the popup.
 
 The project lives at `~/Projects/redirect-path-chrome-extension`.
-GitHub distribution should follow the user's Dark Reader personal-extension pattern.
+Distribute installation-ready GitHub ZIPs with the project's manual Linux update helper.
 Web Store release automation is explicitly deferred.
 
 ## Implemented browser behavior
 
 The live MV3 extension implements the following behavior. The offline design preview still uses synthetic samples.
 
-| Event or condition | Planned behavior |
+| Event or condition | Behavior |
 | --- | --- |
 | New main-frame request | Create or advance the active tab's capture without refetching the page |
 | Server redirect | Append the response and Location target under the browser request ID |

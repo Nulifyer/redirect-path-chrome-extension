@@ -3,12 +3,12 @@
 ## Product rules
 
 - Read `.agents/README.md` and current project records before substantial work.
-- This project is an independent redirect debugging extension. Do not copy Ayima code, images, or branding into product source or release assets.
+- Redirect Inspector is the user's own redirect debugging and auditing tool. Develop its code, interface, and documentation around its own goals.
 - Capture automatically on page load, as confirmed by the user on 2026-11-03.
 - Keep captured navigation evidence local and session-only. No AI endpoint, telemetry, promotional links, remote assets, or unsolicited tabs.
 - Use Base UI controls and the T3 Code / Material 3 direction recorded in `.agents/reference/DESIGN.md`.
 - The live extension must use actual captured navigation evidence. Keep the offline sample preview clearly identified.
-- Keep the stable manifest public key and same-directory update behavior. Follow the Dark Reader GitHub ZIP and manual helper pattern. Web Store automation is deferred.
+- Keep the stable manifest public key and same-directory update behavior. Distribute installable GitHub ZIPs with the project's manual Linux update helper. Web Store automation is deferred.
 - Exclude `research/artifacts/` and downloaded reference source from Git and release packages.
 
 ## Project continuity
@@ -21,3 +21,8 @@ For substantial work, read `.agents/README.md` and only the relevant task record
 - `docs/` is for end users: installation, updates, walkthroughs, examples, troubleshooting, and privacy.
 - Keep build commands, architecture, design rationale, release engineering, audit methods, test results, and project history under `.agents/`.
 - Do not add implementation details or internal project records to the README or user guides.
+
+## Product identity
+
+- Present Redirect Inspector as the user's own tool. Do not frame it as a fork, replacement, or derivative of another extension.
+- Keep comparisons and unrelated extension investigations out of tracked project documentation and active work records.

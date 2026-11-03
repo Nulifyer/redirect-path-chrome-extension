@@ -1,6 +1,5 @@
 # GitHub releases and updates
 
-The delivery pattern follows the user's Dark Reader personal extension.
 Releases contain installation-ready unpacked Chromium ZIPs, checksums, provenance, instructions, and a Linux download helper.
 The browser extension does not contact GitHub. The helper contacts GitHub when invoked explicitly.
 

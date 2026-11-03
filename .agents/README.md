@@ -33,4 +33,3 @@ Address one logical result, update its owning records, and run affected checks. 
 - [Design](reference/DESIGN.md) for UI references and choices.
 - [Release engineering](reference/DISTRIBUTION.md) for packaging and GitHub workflows.
 - [Verification](reference/VERIFICATION.md) for observed delivery evidence.
-- [Original-extension audit](reference/PRIVACY-AUDIT.md) for the historical investigation.

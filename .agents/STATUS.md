@@ -6,11 +6,12 @@ State: implemented, verified, and published
 
 ## Project state
 
-The live MV3 extension, compact popup, GitHub workflows, package builder, Linux updater, privacy policy, and investigation docs are complete.
+The live MV3 extension, compact popup, GitHub workflows, package builder, Linux updater, privacy policy, and user guides are complete.
 Source is published at https://github.com/Nulifyer/redirect-path-chrome-extension.
 The first public release is v0.1.1, built from source commit `5f0732c52b32866a0b0331829b25ed781ffe9391`.
 The exact installable package remains at `dist/release/extension`, with the ZIP and updater alongside it.
 The user's browser profile was not modified.
+Redirect Inspector is framed as the user's own auditing tool.
 The README now introduces the product; `docs/` contains end-user guides and examples. Engineering references are under `.agents/reference/`, with build instructions in `.agents/DEVELOPMENT.md`.
 
 ## Current batch

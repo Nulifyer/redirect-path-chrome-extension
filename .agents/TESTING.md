@@ -33,7 +33,6 @@ It requires Python 3.9+ and OpenSSL. Temporary profiles and fixture certificates
 No user browser profile is used. The HSTS fixture maps a preloaded .dev hostname to 127.0.0.1 and trusts only that fixture certificate's SPKI.
 Browser screenshots and structured evidence go under ignored `test-results/`.
 
-For the historical vendor audit only, `bun scripts/check-audit-retention.ts` requires the ignored downloaded artifact.
 Project records can be checked with the local project-continuity skill validator.
 
 ## Environment
@@ -47,4 +46,4 @@ The package builder generates a deterministic ZIP through Python and includes bu
 JavaScript redirects remain inferred from navigation signals and recent trusted gestures. This does not identify script source.
 History restores, protected browser pages, or restricted site access can lack network metadata.
 This is not a full accessibility audit, an exhaustive public-site compatibility audit, or verification of every Chromium derivative.
-Web Store packaging/submission and incognito are not covered. No original Ayima extension was installed into a live browser.
+Web Store packaging/submission and incognito are not covered.
