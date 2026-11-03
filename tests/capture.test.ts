@@ -4,8 +4,50 @@ import { exportCapture, copySummary, redactUrl, type Capture } from '../src/mode
 
 function events(values: CaptureEvent[]) { let state: TabState | undefined; for (const e of values) state = record(state, e); return state!; }
 const start = (requestId = 'a', url = 'https://example.com/a', time = 1): CaptureEvent => ({ type: 'start', requestId, url, time, method: 'GET' });
-const response = (type: 'redirect' | 'complete' | 'headers', requestId = 'a', url = 'https://example.com/a', status = 200, time = 10): CaptureEvent => ({ type, requestId, url, status, time });
+type ResponseEvent = Extract<CaptureEvent, { type: 'headers' | 'redirect' | 'complete' | 'error' }>;
+const response = (type: 'redirect' | 'complete' | 'headers', requestId = 'a', url = 'https://example.com/a', status = 200, time = 10): ResponseEvent => ({ type, requestId, url, status, time });
 const commit = (url = 'https://example.com/a', qualifiers: string[] = [], transition = 'link', documentId = 'd'): CaptureEvent => ({ type: 'commit', url, qualifiers, transition, documentId, time: 12 });
+const navigate = (url = 'https://example.com/a', time = 0): CaptureEvent => ({ type: 'navigation-start', url, time });
+const abort = (requestId = 'a', url = 'https://example.com/a', time = 10): ResponseEvent => ({ type: 'error', requestId, url, time, error: 'net::ERR_ABORTED' });
+
+test('request restarts within one navigation retain the observed server redirects', () => {
+  const a = 'https://example.com/a', b = 'https://example.com/b', c = 'https://other.example.com/c';
+  const s = events([navigate(), start(), abort(), start('retry',a,11),
+    { ...response('redirect','retry',a,302,20), redirectUrl:b }, start('retry',b,21), abort('retry',b,22),
+    start('next',b,23), { ...response('redirect','next',b,302,30), redirectUrl:c }, start('next',c,31), abort('next',c,32),
+    start('final',c,33), response('complete','final',c,200,40), commit(c,['server_redirect'],'typed')]);
+  expect(s.capture.hops.map(h=>[h.url,h.status,h.kind])).toEqual([[a,302,'http'],[b,302,'http'],[c,200,'final']]);
+  expect(s.capture.label).toBe(a);
+  expect(s.capture.complete).toBe(true);
+  expect(s.request?.id).toBe('final');
+});
+test('a fresh navigation to the same aborted URL starts a new capture', () => {
+  const a='https://example.com/a', b='https://example.com/b';
+  const s=events([navigate(),start(),response('redirect','a',a,302),start('a',b,11),abort('a',b,12),
+    navigate(b,20),start('new',b,21),response('complete','new',b,200,30),commit(b,[],'typed')]);
+  expect(s.capture.hops.map(h=>h.status)).toEqual([200]);
+  expect(s.capture.label).toBe(b);
+});
+test('a server redirect can hand off directly to a new request ID', () => {
+  const a='https://example.com/a', b='https://other.example.com/b';
+  const s=events([navigate(),start(),{...response('redirect','a',a,302),redirectUrl:b},
+    start('handoff',b,11),abort('handoff',b,12),start('retry',b,13),response('complete','retry',b,200,20),commit(b,['server_redirect'],'typed')]);
+  expect(s.capture.hops.map(h=>[h.url,h.status])).toEqual([[a,302],[b,200]]);
+  const newVisit=events([navigate(),start(),{...response('redirect','a',a,302),redirectUrl:b},navigate(b,11),start('new',b,12),response('complete','new',b,200,20),commit(b,[],'typed')]);
+  expect(newVisit.capture.hops.map(h=>h.status)).toEqual([200]);
+});
+test('a delayed before-navigate callback still identifies the pending request', () => {
+  const s=events([start('a',undefined,2),navigate(undefined,1),abort(),start('retry',undefined,11),response('complete','retry'),commit()]);
+  expect(s.capture.id).toBe('a');
+  expect(s.capture.hops.map(h=>h.status)).toEqual([200]);
+});
+test('a terminal network failure remains visible and is not merged with a retry', () => {
+  const s=events([navigate(),start(),response('redirect','a',undefined,302),start('a','https://example.com/b',11),
+    {...abort('a','https://example.com/b',12),error:'net::ERR_NAME_NOT_RESOLVED'},start('retry','https://example.com/b',13)]);
+  expect(s.capture.hops).toHaveLength(0);
+  const terminal=events([navigate(),start(),abort()]);
+  expect(terminal.capture.hops[0].error).toBe('net::ERR_ABORTED');
+});
 
 test('one request ID retains all HTTP hops, repeated URLs, status and timing', () => {
   const s = events([start(), response('redirect', 'a', undefined, 302), start('a', 'https://example.com/b', 11), response('redirect', 'a', 'https://example.com/b', 307, 20), start('a', 'https://example.com/a', 21), response('complete', 'a', undefined, 200, 30), commit()]);
@@ -26,6 +68,18 @@ test('observed meta target takes precedence over JavaScript inference', () => {
   const s = events([start(), response('complete'), commit(), { type: 'document', documentId: 'd', url: 'https://example.com/a', meta: { url: 'https://example.com/b', delay: 0 }, time: 14 }, start('b', 'https://example.com/b'), response('complete', 'b', 'https://example.com/b'), commit('https://example.com/b', ['client_redirect'], 'link', 'd2')]);
   expect(s.capture.hops.map(h => h.kind)).toEqual(['meta', 'final']);
   expect(s.capture.hops[0].metaDelaySeconds).toBe(0);
+});
+test('early document hints survive commit and classify the following meta refresh', () => {
+  const a='https://example.com/a',b='https://example.com/b';
+  const s=events([start(),response('headers'),{type:'document',documentId:'d',url:a,time:11,meta:{url:b,delay:0}},commit(),
+    response('complete'),start('b',b,15),response('complete','b',b,200,20),commit(b,['client_redirect'],'link','d2')]);
+  expect(s.capture.hops.map(h=>h.kind)).toEqual(['meta','final']);
+});
+test('HTTP Refresh uses its response header and retains its declared delay', () => {
+  const a='https://example.com/a',b='https://example.com/b';
+  const s=events([start(),{...response('complete'),headers:[{name:'Refresh',value:'1; URL=/b'}]},commit(),
+    start('b',b,20),response('complete','b',b,200,30),commit(b,['client_redirect'],'link','d2')]);
+  expect(s.capture.hops[0]).toMatchObject({url:a,kind:'refresh',refreshDelaySeconds:1,status:200});
 });
 test('trusted user gesture and back/forward prevent a client classification', () => {
   const before = [start(), response('complete'), commit(), { type: 'document', documentId: 'd', url: 'https://example.com/a', userGesture: true, time: 14 } as CaptureEvent];
@@ -65,6 +119,15 @@ test('redaction preserves duplicate query keys and malformed Location cannot bre
   expect(new URL(redactUrl('https://example.com/?a=one&a=two')).searchParams.getAll('a')).toEqual(['REDACTED','REDACTED']);
   const c:Capture={id:'r',label:'https://example.com/',complete:true,hops:[{url:'https://example.com/',status:302,kind:'http',durationMs:1,ip:null,headers:[{name:'Location',value:'http://['}]}]};
   expect(JSON.parse(exportCapture(c)).hops[0].headers[0].value).toBe('[invalid location]');
+});
+test('Refresh header targets follow export redaction, including malformed declarations', () => {
+  const c:Capture={id:'r',label:'https://example.com/',complete:true,hops:[{url:'https://example.com/',status:200,kind:'refresh',durationMs:1,ip:null,headers:[
+    {name:'Refresh',value:'0;url=/next?token=refresh-secret#private'},
+    {name:'refresh',value:'invalid;url=/next?token=refresh-secret'},
+  ]}]};
+  expect(exportCapture(c)).not.toContain('refresh-secret');
+  expect(exportCapture(c)).not.toContain('#private');
+  expect(exportCapture(c,true)).toContain('refresh-secret');
 });
 test('header and step limits do not corrupt the final active response index', () => {
   let state:TabState|undefined;

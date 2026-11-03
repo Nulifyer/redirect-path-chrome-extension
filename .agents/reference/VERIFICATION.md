@@ -1,5 +1,19 @@
 # Verification
 
+## Redirect scenario expansion and Maps
+
+Live v0.1.3 traces reproduced lost Maps redirects: Chrome emitted net::ERR_ABORTED retries and direct redirect handoffs under new request IDs, while the old capture reset to the final 200 response. The normalized-event regression covers both paths, fresh same-URL visits, delayed navigation-start delivery, and terminal failures.
+
+The fixed packaged extension captured 302 → 302 → 200 for both https://maps.google.com/ and http://maps.google.com/ in an isolated Chromium profile on 2026-11-03. The final network response was https://www.google.com/maps. Public observations are not used as CI fixtures.
+
+Type checking, 29 unit tests, all 36 real-browser check groups, and seven popup scenarios at 640px and 360px passed. The [scenario contract](REDIRECT-SCENARIOS.md) maps the coverage. New cases include mixed script/meta/server chains, immediate location.replace and location.assign, quoted/base-relative/delayed/dynamic meta refresh, an invalid meta before a valid one, meta and HTTP same-URL refreshes, HTTP Refresh headers, relative Location with fragments, 302 without Location, origin/protocol changes, POST 303/307/308 methods without form bodies, cached 301, iframe/fetch exclusion, and history push/replace preservation.
+
+HTTP Refresh now has a REF badge and declared delay. A real popup download verified that its header target query values are redacted; unit checks cover malformed declarations and explicit full export. Early document metadata survives commit ordering. JavaScript attribution remains inferred, and this matrix does not prove every public site or Chromium derivative.
+
+The actual public end-user helper was downloaded to ~/.local/bin/redirect-inspector-update and installed v0.1.3 at ~/.local/share/chrome-extensions/nulifyer-redirect-inspector. Metadata matched the public release. The user clarified that Brave's load/reload controls are theirs to handle; browser UI automation stopped. Publication and end-user update to v0.1.4 are pending.
+
+Ignored evidence: test-results/extension.json, ui.json, maps-observation.json, maps-latest.json, and maps-fixed.log. No signed link tokens or personal browser screenshots were retained in tracked files.
+
 ## Icon artwork
 
 The original SVG master uses rounded route geometry and a starting dot on a blue tile. librsvg generated antialiased 16, 32, 48, and 128 pixel RGBA exports. All four dimensions, PNG format, and byte-for-byte copying into the extension build were verified. The artwork was inspected at native toolbar sizes on light and dark surfaces and at 128 pixels. The inline preview had no console messages.

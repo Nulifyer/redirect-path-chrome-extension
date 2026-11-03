@@ -27,7 +27,7 @@ The live inspector is 600 pixels high. The offline sample preview is 580 pixels 
 1. Small toolbar identifies the task and contains theme, export, and copy actions.
 2. Final hostname and path identify the inspected destination. A status badge shows the final outcome.
 3. A compact summary shows redirect count and measured request time.
-4. The complete chain shows a redirect mechanism badge (`JS`, `META`, `HSTS`) or HTTP status, full URL, and per-request time. The badge replaces the repeated subtitle beneath each URL.
+4. The complete chain shows a redirect mechanism badge (`JS`, `META`, `REF` for an HTTP Refresh header, or `HSTS`) or HTTP status, full URL, and per-request time. The badge replaces the repeated subtitle beneath each URL.
 5. Selecting a step updates the response overview directly below the chain.
 6. The Headers tab shows all headers for that response, with an inline filter.
 

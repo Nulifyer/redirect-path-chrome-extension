@@ -1,3 +1,5 @@
+import { refreshTarget } from './refresh';
+
 // Only navigation hints are collected. No text, form values, or click targets leave the page.
 (() => {
   let lastMeta = '';
@@ -6,16 +8,13 @@
     void chrome.runtime.sendMessage({ type: 'document', ...payload }).catch(() => {});
   }
   function checkMeta() {
-    const element = [...document.querySelectorAll('meta[http-equiv]')].find(el => el.getAttribute('http-equiv')?.toLowerCase() === 'refresh');
-    const value = element?.getAttribute('content') ?? '';
-    if (!value || value === lastMeta) return;
-    lastMeta = value;
-    const match = value.match(/^\s*(\d+(?:\.\d+)?)\s*(?:;\s*url\s*=\s*(.*?)\s*)?$/i);
-    if (!match?.[2]) return;
-    try {
-      const url = new URL(match[2].replace(/^['"]|['"]$/g, ''), document.baseURI);
-      if (/^https?:$/.test(url.protocol)) send({ meta: { url: url.href, delay: Number(match[1]) } });
-    } catch {}
+    const meta = [...document.querySelectorAll('meta[http-equiv]')]
+      .filter(el => el.getAttribute('http-equiv')?.toLowerCase() === 'refresh')
+      .map(el => refreshTarget(el.getAttribute('content') ?? '', document.baseURI)).find(Boolean);
+    const key = meta ? `${meta.delay}:${meta.url}` : '';
+    if (!meta || key === lastMeta) return;
+    lastMeta = key;
+    send({ meta });
   }
   const observer = new MutationObserver(checkMeta);
   observer.observe(document, { subtree: true, childList: true, attributes: true, attributeFilter: ['content', 'http-equiv'] });

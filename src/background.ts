@@ -71,6 +71,9 @@ function event(tabId: number, value: CaptureEvent): undefined {
   return undefined;
 }
 const filter = { urls: ['http://*/*', 'https://*/*'], types: ['main_frame' as const] };
+chrome.webNavigation.onBeforeNavigate.addListener(d => {
+  if (d.frameId === 0) event(d.tabId, { type: 'navigation-start', url: d.url, time: d.timeStamp });
+});
 chrome.webRequest.onBeforeRequest.addListener(d => event(d.tabId, { type: 'start', requestId: d.requestId, url: d.url, time: d.timeStamp, method: d.method }), filter);
 for (const [name, type] of [['onHeadersReceived', 'headers'], ['onBeforeRedirect', 'redirect'], ['onCompleted', 'complete']] as const) {
   chrome.webRequest[name].addListener(d => event(d.tabId, { type, requestId: d.requestId, url: d.url, time: d.timeStamp, status: d.statusCode, headers: d.responseHeaders?.map(h => ({ name: h.name, value: h.value ?? '[binary value]' })), ip: 'ip' in d ? d.ip as string : undefined, fromCache: 'fromCache' in d ? d.fromCache as boolean : undefined, redirectUrl: 'redirectUrl' in d ? d.redirectUrl as string : undefined }), filter, ['responseHeaders']);

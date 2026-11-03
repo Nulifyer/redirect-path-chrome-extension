@@ -5,6 +5,7 @@
 Type checks verify TypeScript consistency. Unit tests cover normalized capture events, navigation identity, classification, bounds, redaction, and presentation.
 The browser check loads the built extension in an isolated Chromium profile and exercises real local HTTP/TLS navigations.
 The UI check opens the offline sample file for layout, keyboard, theme, and sample-state checks.
+The [redirect scenario contract](reference/REDIRECT-SCENARIOS.md) defines mechanism and navigation coverage. Browser fixtures verify actual Chrome behavior; recorded-event tests cover Maps-style request-ID handoffs/retries and callback ordering. Public Maps observations are additional evidence and do not run in CI.
 Updater tests verify installation, archive validation, checksum failures, rollback, locking constraints, check-only behavior, and downgrade rejection.
 Exact completed checks and limitations belong in `.agents/reference/VERIFICATION.md`.
 

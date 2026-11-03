@@ -1,8 +1,10 @@
+import { refreshTarget } from './refresh';
+
 export type Header = { name: string; value: string };
 export type Hop = {
   url: string;
   status: number | null;
-  kind: 'http' | 'hsts' | 'javascript' | 'meta' | 'final' | 'error';
+  kind: 'http' | 'hsts' | 'javascript' | 'meta' | 'refresh' | 'final' | 'error';
   durationMs: number | null;
   ip: string | null;
   fromCache?: boolean;
@@ -16,6 +18,7 @@ export type Hop = {
   headersTruncated?: boolean;
   note?: string;
   metaDelaySeconds?: number;
+  refreshDelaySeconds?: number;
 };
 export type Capture = { id: string; label: string; hops: Hop[]; complete: boolean; sample?: boolean; startedAt?: number; truncated?: boolean };
 
@@ -28,6 +31,7 @@ export function hopLabel(hop: Hop): string {
   if (hop.kind === 'hsts') return 'Browser HTTPS upgrade';
   if (hop.kind === 'javascript') return 'JavaScript redirect · inferred';
   if (hop.kind === 'meta') return hop.metaDelaySeconds === undefined ? 'Meta refresh' : `Meta refresh · ${hop.metaDelaySeconds}s delay`;
+  if (hop.kind === 'refresh') return hop.refreshDelaySeconds === undefined ? 'HTTP Refresh' : `HTTP Refresh · ${hop.refreshDelaySeconds}s delay`;
   if (hop.kind === 'error') return hop.error ?? 'Network error';
   if (hop.status !== null && hop.status >= 400) return 'HTTP error';
   if (hop.kind === 'final') return 'Final response';
@@ -37,6 +41,7 @@ export function hopLabel(hop: Hop): string {
 export function hopBadge(hop: Hop): string {
   if (hop.kind === 'javascript') return 'JS';
   if (hop.kind === 'meta') return 'META';
+  if (hop.kind === 'refresh') return 'REF';
   if (hop.kind === 'hsts') return 'HSTS';
   return String(hop.status ?? (hop.kind === 'error' ? 'ERR' : 'N/A'));
 }
@@ -48,7 +53,7 @@ export function hopDescription(hop: Hop): string {
 export function tone(hop: Hop): 'success' | 'warning' | 'info' | 'error' {
   if (hop.kind === 'error' || (hop.status !== null && hop.status >= 400)) return 'error';
   if (hop.kind === 'final') return hop.status === null ? 'info' : 'success';
-  if (hop.status === 302 || hop.status === 307 || hop.kind === 'javascript' || hop.kind === 'meta') return 'warning';
+  if (hop.status === 302 || hop.status === 307 || hop.kind === 'javascript' || hop.kind === 'meta' || hop.kind === 'refresh') return 'warning';
   return 'info';
 }
 
@@ -87,6 +92,9 @@ export function exportCapture(capture: Capture, full = false): string {
         let value = h.value;
         if (/^(location|content-location)$/i.test(h.name)) {
           try { value = redactUrl(new URL(value, hop.url).href); } catch { value = '[invalid location]'; }
+        } else if (/^refresh$/i.test(h.name)) {
+          const target = refreshTarget(value, hop.url);
+          value = target ? `${target.delay}; url=${redactUrl(target.url)}` : '[invalid refresh]';
         } else if (/cookie|auth|token|secret|session|api[-_]?key/i.test(h.name)) value = '[REDACTED]';
         return { name: h.name, value };
       });

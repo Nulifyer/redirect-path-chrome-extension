@@ -20,11 +20,12 @@ The live MV3 extension implements the following behavior. The offline design pre
 | Event or condition | Behavior |
 | --- | --- |
 | New main-frame request | Create or advance the active tab's capture without refetching the page |
-| Server redirect | Append the response and Location target under the browser request ID |
+| Server redirect | Append the response and Location target, preserving explicit target handoffs and abort retries across request IDs within the same top-frame navigation |
 | Response headers | Preserve available names and values, including duplicate fields |
 | Completion or error | Finalize status or network error without inventing missing values |
 | Browser navigation commit | Correlate document ID, URL, and transition qualifiers with captured requests |
 | Meta refresh | Use observed target and delay as classification evidence |
+| HTTP Refresh header | Match its resolved target to the next navigation and show REF with the declared delay |
 | Client navigation without meta evidence | Label JavaScript classification as inferred when that is all the evidence supports |
 | Typed URL, clicked link, reload, back/forward | Start a new capture, while retaining the correct in-flight HTTP hops |
 | HSTS upgrade | Label it as a browser upgrade, separate from a network response |
@@ -40,6 +41,7 @@ between webRequest and webNavigation events.
 Listeners must register synchronously at worker startup, with initialization buffering behind them.
 Do not correlate requests solely by URL, because repeat visits and redirect loops reuse URLs.
 Client redirects can cross request IDs. Preserve evidence about their relationship and classification confidence.
+Use top-frame navigation-start timestamps to keep retries distinct from new visits. An aborted attempt can be replaced only by a same-URL retry in the same uncommitted navigation; a new request ID can also follow an explicitly observed redirect target. Preserve early document metadata when navigation and request callbacks arrive in different orders.
 Do not claim script attribution from browser transition qualifiers alone.
 
 ## Modules and test seams
@@ -75,6 +77,7 @@ Keep response data session-only. Store presentation preferences separately.
 - Browser fixture server exercises a direct response and 301/302/303/307/308 chains.
 - Distinct 404, 500, DNS failure, and redirect-loop results stay distinguishable.
 - Meta refresh, script navigation, actual user link clicks, back/forward, and reload have tested chain boundaries.
+- The [redirect scenario contract](REDIRECT-SCENARIOS.md) covers mixed mechanisms, HTTP Refresh, same-URL refreshes, cross-origin/protocol chains, POST method changes, cached redirects, relative targets, and frame/history exclusions.
 - Repeated URLs, overlapping tab navigations, worker suspension, cached results, and tab close do not corrupt or leak captures.
 - HSTS behavior is established in a controlled browser fixture, rather than assumed from status 307 alone.
 - Browser tests prove closed-tab session keys disappear and do not return after worker restart.

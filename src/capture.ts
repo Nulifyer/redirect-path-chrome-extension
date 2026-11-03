@@ -1,16 +1,19 @@
 import { header, type Capture, type Header, type Hop } from './model';
+import { refreshTarget } from './refresh';
 
 type DocumentEvidence = { id?: string; url?: string; meta?: { url: string; delay: number }; gestureAt?: number };
-type Request = { id: string; url: string; startedAt: number; index: number; method: string; urls: string[]; committed?: boolean };
+type Request = { id: string; url: string; startedAt: number; index: number; method: string; urls: string[]; committed?: boolean; navigationStartedAt?: number };
 export type TabState = {
   capture: Capture;
   request?: Request;
   document: DocumentEvidence;
   previous?: { capture: Capture; document: DocumentEvidence };
   updatedAt: number;
+  navigation?: { startedAt: number; url: string };
 };
 type Response = { requestId: string; url: string; time: number; status?: number; headers?: Header[]; ip?: string; fromCache?: boolean; redirectUrl?: string; error?: string };
 export type CaptureEvent =
+  | { type: 'navigation-start'; url: string; time: number }
   | { type: 'start'; requestId: string; url: string; time: number; method: string }
   | ({ type: 'headers' | 'redirect' | 'complete' | 'error' } & Response)
   | { type: 'navigation-error'; url: string; time: number; error: string }
@@ -61,7 +64,13 @@ export function record(input: TabState | undefined, event: CaptureEvent): TabSta
     return record(input, { ...event, type: 'error', requestId: input.request.id });
   }
   let state = input;
-  if (event.type === 'start') {
+  if (event.type === 'navigation-start') {
+    if (state?.navigation && event.time < state.navigation.startedAt) return input;
+    state ??= { capture: { id: `navigation-${event.time}`, label: event.url, hops: [], complete: false, startedAt: event.time }, document: {}, updatedAt: event.time };
+    state.navigation = { startedAt: event.time, url: event.url };
+    // webNavigation callbacks can arrive after webRequest callbacks.
+    if (state.request && state.request.startedAt >= event.time) state.request.navigationStartedAt = event.time;
+  } else if (event.type === 'start') {
     if (state?.request?.id === event.requestId) {
       state.request.url = event.url;
       state.request.startedAt = event.time;
@@ -69,17 +78,33 @@ export function record(input: TabState | undefined, event: CaptureEvent): TabSta
       state.request.index = state.capture.hops.length;
       state.request.urls.push(event.url);
       state.request.urls = state.request.urls.slice(-50);
+    } else if (state?.navigation && state.request && state.request.navigationStartedAt === state.navigation.startedAt
+      && !state.request.committed && (
+        (sameUrl(state.request.url, event.url) && state.capture.hops[state.request.index]?.error === 'net::ERR_ABORTED')
+        || (['http', 'hsts'].includes(state.capture.hops[state.request.index]?.kind ?? '')
+          && sameUrl(state.capture.hops[state.request.index]?.redirectUrl ?? '', event.url))
+      )) {
+      // Chromium can hand off a redirect or retry an aborted navigation under a new ID.
+      // Only an explicit redirect target or same-URL abort retry can continue this navigation.
+      if (state.capture.hops[state.request.index]?.kind === 'error') state.capture.hops.splice(state.request.index);
+      state.capture.complete = false;
+      state.request = { ...state.request, id: event.requestId, url: event.url, startedAt: event.time, index: state.capture.hops.length,
+        urls: sameUrl(state.request.url, event.url) ? state.request.urls : [...state.request.urls, event.url].slice(-50), method: event.method };
     } else {
       state = {
         capture: { id: event.requestId, label: event.url, hops: [], complete: false, startedAt: event.time },
-        request: { id: event.requestId, url: event.url, startedAt: event.time, index: 0, method: event.method, urls: [event.url] },
+        request: { id: event.requestId, url: event.url, startedAt: event.time, index: 0, method: event.method, urls: [event.url], navigationStartedAt: input?.navigation?.startedAt },
         previous: input?.document.id && input.capture.hops.length ? { capture: input.capture, document: input.document } : undefined,
-        document: {}, updatedAt: event.time,
+        document: {}, updatedAt: event.time, navigation: input?.navigation,
       };
     }
   } else if (event.type === 'document') {
     if (!state) return input;
-    const document = [state.document,state.previous?.document].find(d=>d?.id===event.documentId&&sameUrl(d.url??'',event.url));
+    let document = [state.document,state.previous?.document].find(d=>d?.id===event.documentId&&sameUrl(d.url??'',event.url));
+    if (!document && !state.document.id && state.request && !state.request.committed && sameUrl(state.request.url, event.url)) {
+      state.document = { id: event.documentId, url: event.url };
+      document = state.document;
+    }
     if (!document) return input;
     if (event.meta) document.meta = event.meta;
     if (event.userGesture) document.gestureAt = event.time;
@@ -101,8 +126,11 @@ export function record(input: TabState | undefined, event: CaptureEvent): TabSta
         if (last && last.kind === 'final' && last.status !== null) {
           const meta = previous.document.meta;
           const metaMatch = meta && state.request!.urls.some(url => sameUrl(url, meta.url));
-          last.kind = metaMatch ? 'meta' : 'javascript';
+          const refresh = refreshTarget(header(last, 'refresh') ?? '', last.url);
+          const refreshMatch = refresh && state.request!.urls.some(url => sameUrl(url, refresh.url));
+          last.kind = metaMatch ? 'meta' : refreshMatch ? 'refresh' : 'javascript';
           if (metaMatch) last.metaDelaySeconds = meta.delay;
+          if (refreshMatch && !metaMatch) last.refreshDelaySeconds = refresh.delay;
           last.redirectUrl = state.request!.urls[0];
           const offset = prior.hops.length;
           state.capture = { ...state.capture, id: prior.id, label: prior.label, startedAt: prior.startedAt, hops: [...prior.hops, ...state.capture.hops], truncated: prior.truncated };
@@ -112,10 +140,11 @@ export function record(input: TabState | undefined, event: CaptureEvent): TabSta
       state.request!.committed = true;
       for (const hop of state.capture.hops) if (hop.requestId === state.request!.id) hop.documentId = event.documentId;
     }
-    state.document = { id: event.documentId, url: event.url };
+    state.document = { ...(state.document.id === event.documentId ? state.document : {}), id: event.documentId, url: event.url };
     delete state.previous;
   } else {
-    if (!state?.request || state.request.id !== event.requestId || !sameUrl(state.request.url, event.url)) return input;
+    if (!state?.request || state.request.id !== event.requestId || !sameUrl(state.request.url, event.url)
+      || (state.navigation && state.request.navigationStartedAt !== state.navigation.startedAt)) return input;
     const request = state.request;
     const existing = state.capture.hops[request.index];
     const headers = event.headers ? safeHeaders(event.headers) : existing?.headers ?? [];

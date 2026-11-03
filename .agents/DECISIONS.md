@@ -10,6 +10,8 @@
 | D4 | Use established UI references | User explicitly requested T3 Code and Material You | User request and `.agents/reference/DESIGN.md` |
 | D5 | Distribute through GitHub ZIPs and a manual Linux helper | Provide installation and update options owned by this project | User request and verified project releases |
 | D6 | Defer Web Store release automation | User wants a later workflow discussion | User request, 2026-11-03 |
+| D7 | Run the end-user installation/update script; leave Brave controls to the user | User explicitly asked to handle browser reload personally | User clarification, 2026-11-03 |
+| D8 | Verify a broad redirect scenario matrix | Maps exposed a request-lifecycle gap; the user requires different mechanisms and navigation boundaries to work correctly | User request, 2026-11-03 |
 
 ## Working implementation choices
 

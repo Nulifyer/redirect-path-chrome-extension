@@ -7,6 +7,7 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import type { TabState } from '../src/capture';
 
+const selfRefreshVisits = new Map<string, number>();
 const server = Bun.serve({ port: 0, hostname: '127.0.0.1', fetch(request) {
   const u = new URL(request.url);
   const headers = { 'content-type': 'text/html', 'cache-control': 'no-store', 'x-audit': 'fixture' };
@@ -17,13 +18,33 @@ const server = Bun.serve({ port: 0, hostname: '127.0.0.1', fetch(request) {
   if (u.pathname === '/loop') return new Response('', { status: 302, headers: { location: '/loop' } });
   if (u.pathname === '/script') return new Response('<script>setTimeout(()=>location.href="/redirect/302",120)</script>', {headers});
   if (u.pathname === '/meta') return new Response('<meta http-equiv="refresh" content="0; URL=/redirect/301">', {headers});
+  if (u.pathname === '/script-immediate') return new Response('<script>location.replace("/redirect/303")</script>', {headers});
+  if (u.pathname === '/script-chain') return new Response('<script>location.assign("/meta-base")</script>', {headers});
+  if (u.pathname === '/meta-base') return new Response('<base href="/nested/"><meta http-equiv="refresh" content="0; URL=\'../redirect/302\'">', {headers});
+  if (u.pathname === '/meta-delayed') return new Response('<meta http-equiv="refresh" content="1; URL=/redirect/307">', {headers});
+  if (u.pathname === '/meta-dynamic') return new Response('<script>setTimeout(()=>{const m=document.createElement("meta");m.httpEquiv="refresh";m.content="0; URL=/redirect/308";document.head.append(m)},100)</script>', {headers});
+  if (u.pathname === '/meta-after-invalid') return new Response('<meta http-equiv="refresh" content="invalid"><meta http-equiv="refresh" content="0; URL=/redirect/302">', {headers});
+  if (u.pathname === '/refresh-header') return new Response('Header refresh fixture', {headers:{...headers,refresh:'0; URL=/redirect/302?token=refresh-private'}});
+  if (u.pathname === '/meta-self' || u.pathname === '/header-self') {
+    const first=!selfRefreshVisits.has(u.pathname);
+    selfRefreshVisits.set(u.pathname,1);
+    return new Response(first&&u.pathname==='/meta-self'?'<meta http-equiv="refresh" content="0">':'Self refresh fixture', {headers:first&&u.pathname==='/header-self'?{...headers,refresh:'0'}:headers});
+  }
+  if (u.pathname === '/relative/start') return new Response('', {status:302,headers:{...headers,location:'../redirect/302#section'}});
+  if (u.pathname === '/no-location') return new Response('No redirect target', {status:302,headers});
+  if (u.pathname === '/cache-redirect') return new Response('', {status:301,headers:{...headers,location:'/cache','cache-control':'public, max-age=3600'}});
+  if (u.pathname === '/cross-site') return new Response('', {status:302,headers:{...headers,location:secureBase+'/cross-return'}});
+  if (u.pathname.startsWith('/form/')) return new Response(`<form method="post" action="/submit/${u.pathname.split('/').at(-1)}"><input type="hidden" name="private" value="form-value-private"><button>Submit</button></form>`, {headers});
+  if (u.pathname.startsWith('/submit/')) return new Response('', {status:Number(u.pathname.split('/').at(-1)),headers:{...headers,location:'/method-final'}});
+  if (u.pathname === '/method-final') return new Response('Form destination', {headers:{...headers,'x-seen-method':request.method}});
+  if (u.pathname === '/framed') return new Response('<iframe src="/redirect/302"></iframe><script>fetch("/redirect/303")</script>', {headers});
   if (u.pathname === '/click') return new Response('<a href="/final">Follow link</a><button onclick="location.href=\'/final\'">Navigate</button>', {headers});
   if (u.pathname.startsWith('/status/')) return new Response('HTTP error fixture', {status:Number(u.pathname.split('/').at(-1)),headers});
   if (u.pathname === '/cache') return new Response('Cache fixture', {headers:{...headers,'cache-control':'public, max-age=3600'}});
   if (u.pathname === '/slow') return new Promise<Response>(resolve => setTimeout(() => resolve(new Response('Slow fixture',{headers})),200));
   return new Response('<h1>Final response</h1>',{headers});
 } });
-const base = `http://127.0.0.1:${server.port}`;
+const base: string = `http://127.0.0.1:${server.port}`;
 const profile = await mkdtemp(`${tmpdir()}/redirect-inspector-test-`);
 const certPath = resolve(profile,'fixture.crt');
 const keyPath = resolve(profile,'fixture.key');
@@ -31,8 +52,10 @@ execFileSync('openssl',['req','-x509','-newkey','rsa:2048','-nodes','-keyout',ke
 const publicPem=execFileSync('openssl',['x509','-in',certPath,'-pubkey','-noout']);
 const publicDer=execFileSync('openssl',['pkey','-pubin','-outform','DER'],{input:publicPem});
 const spki=createHash('sha256').update(publicDer).digest('base64');
-const tlsServer=Bun.serve({port:0,hostname:'127.0.0.1',tls:{key:Bun.file(keyPath),cert:Bun.file(certPath)},fetch:()=>new Response('Local HTTPS fixture',{headers:{'cache-control':'no-store'}})});
-const secureBase=`https://redirect-inspector.test.dev:${tlsServer.port}`;
+const tlsServer=Bun.serve({port:0,hostname:'127.0.0.1',tls:{key:Bun.file(keyPath),cert:Bun.file(certPath)},fetch:request=>new URL(request.url).pathname==='/cross-return'
+  ? new Response('',{status:307,headers:{location:base+'/final','cache-control':'no-store'}})
+  : new Response('Local HTTPS fixture',{headers:{'cache-control':'no-store'}})});
+const secureBase: string = `https://redirect-inspector.test.dev:${tlsServer.port}`;
 const extension = resolve(process.env.EXTENSION_DIR ?? 'dist/extension');
 const executablePath = process.env.CHROME_BIN;
 const launch = () => chromium.launchPersistentContext(profile, { channel:'chromium', headless: true, ...(executablePath ? {executablePath} : {}), args: [`--disable-extensions-except=${extension}`, `--load-extension=${extension}`, '--no-proxy-server', '--host-resolver-rules=MAP redirect-inspector.test.dev 127.0.0.1', `--ignore-certificate-errors-spki-list=${spki}`] });
@@ -91,6 +114,74 @@ try {
     assert.equal(state.capture.hops.length,3);
     mark(`${kind} followed by HTTP redirect`);
   }
+  for (const [path, kinds, delay] of [
+    ['/script-immediate',['javascript','http','final'],undefined],
+    ['/script-chain',['javascript','meta','http','final'],0],
+    ['/meta-base',['meta','http','final'],0],
+    ['/meta-delayed',['meta','http','final'],1],
+    ['/meta-dynamic',['meta','http','final'],0],
+    ['/meta-after-invalid',['meta','http','final'],0],
+    ['/refresh-header',['refresh','http','final'],0],
+  ] as const) {
+    await page.goto(base+path).catch(()=>{});
+    state=await waitState(id,s=>s.capture.complete&&s.capture.hops[0]?.url===base+path&&s.capture.hops.at(-1)?.url.includes('/final')===true);
+    assert.deepEqual(state.capture.hops.map(h=>h.kind),kinds,`${path}: classification`);
+    assert.equal(state.capture.hops[0].url,base+path,`${path}: starting document retained`);
+    const meta=state.capture.hops.find(h=>h.kind==='meta');
+    if(meta) assert.equal(meta.metaDelaySeconds,delay);
+    const refresh=state.capture.hops.find(h=>h.kind==='refresh');
+    if(refresh) assert.equal(refresh.refreshDelaySeconds,delay);
+    mark(`${path}: observed client mechanism and complete chain`);
+  }
+  for (const [path,kind] of [['/meta-self','meta'],['/header-self','refresh']] as const) {
+    await page.goto(base+path).catch(()=>{});
+    state=await waitState(id,s=>s.capture.complete&&s.capture.hops.length===2&&s.capture.hops.at(-1)?.url===base+path);
+    assert.deepEqual(state.capture.hops.map(h=>h.kind),[kind,'final']);
+    assert.deepEqual(state.capture.hops.map(h=>h.status),[200,200]);
+    mark(`${path}: automatic same-URL refresh retains both responses`);
+  }
+  await page.goto(`${base}/relative/start`);
+  state=await waitState(id,s=>s.capture.complete&&s.capture.hops[0]?.url===`${base}/relative/start`&&s.capture.hops.length===3);
+  assert.deepEqual(state.capture.hops.map(h=>h.status),[302,302,200]);
+  mark('relative Location and fragment target preserve the HTTP chain');
+  await page.goto(`${base}/no-location`);
+  state=await waitState(id,s=>s.capture.complete&&s.capture.hops[0]?.url===`${base}/no-location`);
+  assert.deepEqual(state.capture.hops.map(h=>[h.status,h.kind]),[[302,'final']]);
+  mark('302 without Location stays a final response');
+  await page.goto(`${base}/cross-site`);
+  state=await waitState(id,s=>s.capture.complete&&s.capture.hops[0]?.url===`${base}/cross-site`&&s.capture.hops.length===3);
+  assert.deepEqual(state.capture.hops.map(h=>h.status),[302,307,200]);
+  assert.equal(state.capture.hops[1].url,secureBase+'/cross-return');
+  mark('cross-origin and HTTP/HTTPS redirect handoffs retain all server responses');
+  for (const code of [303,307,308]) {
+    await page.goto(`${base}/form/${code}`);
+    await page.getByRole('button',{name:'Submit',exact:true}).click();
+    await page.waitForURL(`${base}/method-final`);
+    state=await waitState(id,s=>s.capture.complete&&s.capture.hops[0]?.url===`${base}/submit/${code}`);
+    assert.deepEqual(state.capture.hops.map(h=>h.status),[code,200]);
+    assert.deepEqual(state.capture.hops.map(h=>h.method),['POST',code===303?'GET':'POST']);
+    assert(!JSON.stringify(state).includes('form-value-private'),'Form body must not be captured');
+    mark(`POST ${code}: request methods and server chain retained without form body`);
+  }
+  await page.goto(`${base}/cache-redirect`);
+  await waitState(id,s=>s.capture.complete&&s.capture.hops[0]?.url===`${base}/cache-redirect`&&s.capture.hops.length===2);
+  await page.goto(`${base}/final`);
+  await waitState(id,s=>s.capture.complete&&s.capture.hops[0]?.url===`${base}/final`);
+  await page.goto(`${base}/cache-redirect`);
+  state=await waitState(id,s=>s.capture.complete&&s.capture.hops[0]?.url===`${base}/cache-redirect`);
+  assert.equal(state.capture.hops[0].fromCache,true);
+  assert.deepEqual(state.capture.hops.map(h=>h.status),[301,200]);
+  mark('cached 301 retains its status and browser cache indication');
+  await page.goto(`${base}/framed`);
+  state=await waitState(id,s=>s.capture.complete&&s.capture.hops[0]?.url===`${base}/framed`);
+  assert.equal(state.capture.hops.length,1);
+  const framedId=state.capture.id;
+  await page.evaluate(()=>history.pushState(null,'','/history-push'));
+  assert.equal((await snapshot(id))?.capture.id,framedId);
+  await page.evaluate(()=>history.replaceState(null,'','/history-url'));
+  assert.equal((await snapshot(id))?.capture.id,framedId);
+  assert.equal((await snapshot(id))?.capture.hops.length,1);
+  mark('iframe, fetch redirects and history URL changes do not invent main-frame hops');
   for (const selector of ['a','button']) {
     await page.goto(`${base}/click`);
     await page.locator(selector).click();
@@ -147,7 +238,7 @@ try {
   mark('closing a tab explicitly removes its session storage key');
 
   await page.goto(`${base}/redirect/301,302`);
-  await waitState(id,s=>s.capture.complete && s.capture.hops.length===3);
+  await waitState(id,s=>s.capture.complete&&s.capture.hops[0]?.url===`${base}/redirect/301,302`&&s.capture.hops.length===3);
   await page.bringToFront();
   const popupUrl = `chrome-extension://${worker.url().split('/')[2]}/popup.html`;
   const popupPromise = context!.waitForEvent('page');
@@ -156,6 +247,20 @@ try {
   await popup.getByRole('button',{name:/^Step 3:/}).waitFor({timeout:5000}).catch(async()=>{throw new Error(`Popup state: ${await popup.locator('body').innerText()} Tabs: ${JSON.stringify(await worker.evaluate(()=>chrome.tabs.query({})))}`);});
   await popup.screenshot({path:'test-results/live-popup.png'});
   assert(await popup.locator('.evidence').evaluate(el=>el.scrollHeight<=el.clientHeight),`live default capture fits popup: ${JSON.stringify(await popup.locator('.evidence').evaluate(el=>({scroll:el.scrollHeight,client:el.clientHeight})))}`);
+  await page.goto(`${base}/refresh-header`).catch(()=>{});
+  await popup.getByRole('button',{name:/^Step 1: HTTP Refresh/}).click();
+  await popup.getByText('HTTP Refresh · 0s delay',{exact:true}).waitFor();
+  assert.equal(await popup.locator('.hop .status-badge').first().textContent(),'REF');
+  const refreshDownloadPromise=popup.waitForEvent('download');
+  await popup.getByRole('button',{name:'Export JSON',exact:true}).click();
+  const refreshDownload=await refreshDownloadPromise;
+  const refreshExport=await Bun.file((await refreshDownload.path())!).text();
+  assert(!refreshExport.includes('refresh-private'),'Refresh header query values must be redacted');
+  assert(refreshExport.includes('REDACTED'),'Refresh export must retain its redaction marker');
+  mark('HTTP Refresh badge, delay and redacted header targets in the live popup');
+  await page.goto(`${base}/redirect/301,302`);
+  await waitState(id,s=>s.capture.complete&&s.capture.hops[0]?.url===`${base}/redirect/301,302`&&s.capture.hops.length===3);
+  await popup.getByRole('button',{name:/^Step 3:/}).waitFor();
   await popup.getByRole('button',{name:'Pause recording',exact:true}).click();
   await popup.getByRole('button',{name:'Resume recording',exact:true}).waitFor();
   const pausedCapture = await snapshot(id);

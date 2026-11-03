@@ -35,6 +35,9 @@ describe('capture presentation', () => {
     expect(hopBadge(captures.find(c => c.id === 'network')!.hops[0])).toBe('ERR');
     expect(hopBadge(captures.find(c => c.id === 'error')!.hops.at(-1)!)).toBe('404');
     expect(hopBadge({ ...client.hops[3], status: null })).toBe('N/A');
+    const refresh={...client.hops[2],kind:'refresh' as const,refreshDelaySeconds:1};
+    expect(hopBadge(refresh)).toBe('REF');
+    expect(hopDescription(refresh)).toBe('HTTP Refresh · 1s delay · HTTP 200');
   });
   test('exports structured evidence with an explicit sample marker', () => {
     const exported = JSON.parse(exportCapture(captures[0]));
