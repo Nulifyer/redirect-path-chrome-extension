@@ -6,7 +6,10 @@ The original SVG master uses rounded route geometry and a starting dot on a blue
 
 Type checking and the build passed. All runtime JavaScript, HTML, and CSS remain byte-identical to the published v0.1.2 ZIP. The obsolete procedural raster generator was removed after the build switched to committed PNG assets; there are no surviving imports. No new build dependency or extension permission was added.
 
-Release v0.1.3 validation and publication are in progress. No user browser profile was modified.
+[Source checks](https://github.com/Nulifyer/redirect-path-chrome-extension/actions/runs/41690362932) and the [tagged release workflow](https://github.com/Nulifyer/redirect-path-chrome-extension/actions/runs/41690362845) passed, including unit, updater, UI, and real extension browser suites. Source commit: `b5e9be8585821ed33f33eb0cdd8dec9f772a4288`.
+
+[v0.1.3](https://github.com/Nulifyer/redirect-path-chrome-extension/releases/tag/v0.1.3) was published after its downloaded draft checksum, metadata, all 15 ZIP files, and helper matched the local tagged build. ZIP SHA-256: `f4fd7bcc7655a284c58cc755e39154a09846703a2755adfdf515641d1cef40e9`. The actual helper's public lookup reports latest version 0.1.3 without creating an installation.
+Ignored exact evidence is in `test-results/hosted-release-v0.1.3/verification.json`. No user browser profile was modified.
 
 ## Redirect mechanism badges
 

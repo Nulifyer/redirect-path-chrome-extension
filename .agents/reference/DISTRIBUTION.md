@@ -12,8 +12,8 @@ The public key is an identity input, not a publisher signature or an automatic-u
 
 ```sh
 bun run package
-bun run package --check --tag=v0.1.2
-bun run package --tag=v0.1.2
+bun run package --check --tag=v0.1.3
+bun run package --tag=v0.1.3
 ```
 
 The first command permits local preview builds. Tagged commands require clean committed source and a tag pointing at HEAD.
@@ -68,7 +68,7 @@ Web Store credentials, listing assets, OAuth, and release-triggered submission r
 
 ## Published version
 
-The latest public package is [v0.1.2](https://github.com/Nulifyer/redirect-path-chrome-extension/releases/tag/v0.1.2).
-Its hosted release workflow passed, and the downloaded package and helper were verified against the tagged local build. The public helper lookup sees 0.1.2.
+The latest public package is [v0.1.3](https://github.com/Nulifyer/redirect-path-chrome-extension/releases/tag/v0.1.3).
+Its hosted release workflow passed, and the downloaded package and helper were verified against the tagged local build. The public helper lookup sees 0.1.3.
 The first release, v0.1.1, also passed an actual public-helper installation, replacement, and browser Reload that preserved identity and settings.
 Exact evidence is in [verification](VERIFICATION.md).

@@ -2,13 +2,13 @@
 
 Updated: 2026-11-03
 Owner: primary agent
-State: icon update verified locally; release preparation in progress
+State: implemented, verified, and published
 
 ## Project state
 
 The live MV3 extension, compact popup, GitHub workflows, package builder, Linux updater, privacy policy, and user guides are complete.
 Source is published at https://github.com/Nulifyer/redirect-path-chrome-extension.
-The latest public release is v0.1.2, built from source commit `61e3b121e4626259df7dc9b366ada2b1c7a89b5f`.
+The latest public release is v0.1.3, built from source commit `b5e9be8585821ed33f33eb0cdd8dec9f772a4288`.
 The exact installable package remains at `dist/release/extension`, with the ZIP and updater alongside it.
 The user's browser profile was not modified.
 Redirect Inspector is framed as the user's own auditing tool.
@@ -16,15 +16,15 @@ The README now introduces the product; `docs/` contains end-user guides and exam
 
 ## Current batch
 
-Replace the old pixel-drawn icon with original SVG artwork and antialiased PNGs. The rounded route arrow and starting dot were inspected at native toolbar sizes on dark and light backgrounds. Prepare v0.1.3 through the established release workflow.
+Completed: original SVG icon artwork and antialiased PNGs replace the old pixel-drawn icon. Native toolbar sizes were inspected on dark and light surfaces. v0.1.3 is published and available through the updater.
 
 ## In progress
 
-Final package validation and GitHub delivery. No delegated tasks.
+No running implementation or delegated tasks.
 
 ## Next action
 
-Commit the inspected icon update, tag v0.1.3, dispatch the release workflow, and verify downloaded artifacts before publication.
+Respond to installation or feature feedback. Discuss Chrome Web Store publication only when requested. Increase both version owners and use the documented tagged-release workflow for the next release.
 
 ## Blockers
 
@@ -34,7 +34,7 @@ None for GitHub installation. Web Store publication is intentionally deferred.
 
 Local checks, hosted source checks, and the hosted tagged-release workflow passed.
 The public ZIP checksum, all 15 package files, release metadata, and helper matched the local tagged source build.
-The updater's public check-only lookup reports latest version 0.1.2.
+The updater's public check-only lookup reports latest version 0.1.3.
 The actual public helper passed first install and same-directory replacement. A real Chromium extension Reload preserved identity and preferences and cleared session capture data.
 README/user-guide links, standalone packaged-guide links, documentation audiences, whitespace, and project-record structure were checked after the documentation reorganization.
 See `.agents/reference/VERIFICATION.md` for exact URLs, methods, results, and limits.
