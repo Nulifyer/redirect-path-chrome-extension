@@ -12,6 +12,7 @@ const server = Bun.serve({ hostname:'127.0.0.1', port:0, fetch(request) {
   if(path==='/script') return new Response('<script>setTimeout(()=>location.replace("/redirect"),100)</script>',{headers});
   if(path==='/meta') return new Response('<meta http-equiv="refresh" content="0; URL=/redirect">',{headers});
   if(path==='/refresh') return new Response('Refresh fixture',{headers:{...headers,refresh:'0; URL=/redirect'}});
+  if(path==='/form') return new Response('<form method="post" action="/redirect"></form><script>setTimeout(()=>document.forms[0].requestSubmit(),100)</script>',{headers});
   return new Response('<h1>Incognito fixture</h1>',{headers});
 } });
 const base=`http://127.0.0.1:${server.port}`;
@@ -62,14 +63,14 @@ try {
   let privateState=await waitState(privateId,s=>s?.capture.complete===true&&s.capture.hops.length===2);
   assert.deepEqual(privateState!.capture.hops.map(h=>h.status),[302,200]);
   assert.notEqual(privateId,regularId);
-  for(const [path,kind] of [['/script','javascript'],['/meta','meta'],['/refresh','refresh']] as const){
+  for(const [path,kind] of [['/script','javascript'],['/meta','meta'],['/form','form'],['/refresh','refresh']] as const){
     const tab:chrome.tabs.Tab=await worker.evaluate(({windowId,url})=>chrome.tabs.create({windowId,url}),{windowId:privateWindow.id!,url:base+path});
     assert(tab.id!==undefined);
     privateIds.push(tab.id);
     privateState=await waitState(tab.id,s=>s?.capture.complete===true&&s.capture.hops[0]?.url===base+path&&s.capture.hops.length===3);
     assert.deepEqual(privateState!.capture.hops.map(h=>h.kind),[kind,'http','final']);
   }
-  mark('incognito HTTP, JavaScript, meta and HTTP Refresh chains are captured');
+  mark('incognito HTTP, JavaScript, meta, automatic form and HTTP Refresh chains are captured');
   assert.deepEqual((await state(regularId))?.capture,regularState!.capture);
   mark('private navigations do not overwrite the regular tab capture');
   await worker.evaluate(id=>chrome.windows.update(id,{focused:true}),privateWindow.id!);

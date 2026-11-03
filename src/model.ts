@@ -4,7 +4,7 @@ export type Header = { name: string; value: string };
 export type Hop = {
   url: string;
   status: number | null;
-  kind: 'http' | 'hsts' | 'javascript' | 'meta' | 'refresh' | 'final' | 'error';
+  kind: 'http' | 'hsts' | 'javascript' | 'meta' | 'refresh' | 'form' | 'final' | 'error';
   durationMs: number | null;
   ip: string | null;
   fromCache?: boolean;
@@ -30,6 +30,7 @@ export function hopLabel(hop: Hop): string {
   if (hop.note) return hop.note;
   if (hop.kind === 'hsts') return 'Browser HTTPS upgrade';
   if (hop.kind === 'javascript') return 'JavaScript redirect · inferred';
+  if (hop.kind === 'form') return 'Form submission';
   if (hop.kind === 'meta') return hop.metaDelaySeconds === undefined ? 'Meta refresh' : `Meta refresh · ${hop.metaDelaySeconds}s delay`;
   if (hop.kind === 'refresh') return hop.refreshDelaySeconds === undefined ? 'HTTP Refresh' : `HTTP Refresh · ${hop.refreshDelaySeconds}s delay`;
   if (hop.kind === 'error') return hop.error ?? 'Network error';
@@ -40,6 +41,7 @@ export function hopLabel(hop: Hop): string {
 
 export function hopBadge(hop: Hop): string {
   if (hop.kind === 'javascript') return 'JS';
+  if (hop.kind === 'form') return 'FORM';
   if (hop.kind === 'meta') return 'META';
   if (hop.kind === 'refresh') return 'REF';
   if (hop.kind === 'hsts') return 'HSTS';
@@ -53,7 +55,7 @@ export function hopDescription(hop: Hop): string {
 export function tone(hop: Hop): 'success' | 'warning' | 'info' | 'error' {
   if (hop.kind === 'error' || (hop.status !== null && hop.status >= 400)) return 'error';
   if (hop.kind === 'final') return hop.status === null ? 'info' : 'success';
-  if (hop.status === 302 || hop.status === 307 || hop.kind === 'javascript' || hop.kind === 'meta' || hop.kind === 'refresh') return 'warning';
+  if (hop.status === 302 || hop.status === 307 || hop.kind === 'javascript' || hop.kind === 'meta' || hop.kind === 'refresh' || hop.kind === 'form') return 'warning';
   return 'info';
 }
 

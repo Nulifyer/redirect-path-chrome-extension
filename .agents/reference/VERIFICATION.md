@@ -1,5 +1,19 @@
 # Verification
 
+## Delayed automatic authentication returns
+
+The user reported an automatic page → Microsoft → Okta → Microsoft → callback → app flow after system/network detection, without credentials or clicks. The reducer has no elapsed-time cutoff. A controlled multi-origin auth return reproduced dropped earlier responses against the v0.1.6 package: the automatic form_submit transition started a new capture. Scripted requestSubmit() also dispatches a trusted submit event; submit alone was incorrectly treated as user-input evidence.
+
+Automatic form-submit transitions now preserve the existing chain and label the preceding response FORM. Pointer, key and click signals still separate user-initiated visits. No form data, request-body access, new permissions, or provider-name heuristics were added.
+
+Local type checking, 32 unit tests, 14 updater tests, all 42 browser check groups and seven popup UI scenarios passed. Five cross-origin fixtures retain the full 302 → JS → automatic handoff → 303 → 302 → 200 chain after a 35-second wait and forced extension-worker stop: submit(), requestSubmit(), JS, DOM meta refresh and HTTP Refresh. Worker-global marker loss confirms a new execution. No worker polling occurs during the delay. Normalized-event tests also cover three-minute form and ten-minute JS returns and a genuine user form submission starting a new capture.
+
+All eight incognito browser checks also passed, including automatic requestSubmit handoff in a private tab.
+
+The real popup displays 302 / JS / FORM / 303 / 302 / 200 and preserves HTTP 200 response details on the FORM step. Its default JSON export redacts the callback code. The form-body sentinel is absent from stored captures and exports. Existing ordinary clicks, method changes, tab cleanup, session lifetime and no-external-request checks pass.
+
+This reproduces the mechanism with disposable local provider origins, not the user's private organization deployment. Release v0.1.7 publication and permanent installation are pending. Ignored evidence: test-results/auth-before-fix.log, auth-after-fix.log, extension.json and auth-popup.png.
+
 ## User-controlled incognito access
 
 The user's instruction supersedes the earlier incognito restriction. Standard spanning mode now leaves access under the browser's native Allow in incognito setting, without an extension-specific gate. The existing session-memory capture store remains keyed by tab. Worker hydration includes every accessible live tab, including private tabs when permission is enabled.

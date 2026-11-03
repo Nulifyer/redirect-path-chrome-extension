@@ -1,7 +1,7 @@
 # Redirect scenario contract
 
 Owner: primary agent
-Request: the user reported lost Maps redirects and requires broad scenario coverage.
+Request: the user reported lost Maps redirects and delayed automatic third-party authentication chains, and requires broad scenario coverage.
 
 Controlled browser fixtures are the repeatable acceptance check. Live Maps is an additional observation, not a CI dependency. A public site's future response is not fixed by these fixtures.
 
@@ -16,6 +16,7 @@ Controlled browser fixtures are the repeatable acceptance check. Live Maps is an
 | Immediate/delayed location assign and replace | Inferred JavaScript badge; preceding HTTP/client steps retained |
 | Immediate/delayed, quoted, relative, dynamic meta refresh | Meta badge with observed target and delay |
 | HTTP Refresh header | Distinguished from JavaScript and DOM meta refresh |
+| Delayed multi-provider authentication | App → provider → environment check → provider → callback → app remains one chain after a 35-second delay and forced worker suspension; automatic submit(), requestSubmit(), JS, meta and HTTP Refresh handoffs are distinguished; form bodies are absent and callback codes are redacted in exports |
 | Mixed client/server mechanisms | Complete ordered chain across committed documents |
 | Request ID changes and same-URL abort retries | Preserve earlier redirects within the same top-frame navigation |
 | New visit to the same URL | New capture even if an earlier request was aborted |
@@ -30,4 +31,4 @@ Controlled browser fixtures are the repeatable acceptance check. Live Maps is an
 
 Each browser assertion is recorded in ignored `test-results/extension.json`. Normalized recorded-event regressions cover event order and request-ID changes that are not deterministic on a local fixture server. Public Maps evidence is kept under ignored `test-results/`.
 
-All contract rows passed their relevant local checks on 2026-11-03: 36 redirect browser check groups, eight incognito browser check groups and 29 unit tests, plus the seven-scenario popup UI suite. Both pushState and replaceState were exercised without altering the network capture. The HTTP Refresh popup export was checked for query-value redaction. Exact release evidence belongs in VERIFICATION.md.
+All contract rows passed their relevant local checks on 2026-11-03: 42 redirect browser check groups, eight incognito browser check groups and 32 unit tests, plus the seven-scenario popup UI suite. Both pushState and replaceState were exercised without altering the network capture. The HTTP Refresh popup export was checked for query-value redaction. Exact release evidence belongs in VERIFICATION.md.

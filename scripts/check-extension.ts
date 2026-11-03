@@ -11,6 +11,18 @@ const selfRefreshVisits = new Map<string, number>();
 const server = Bun.serve({ port: 0, hostname: '127.0.0.1', fetch(request) {
   const u = new URL(request.url);
   const headers = { 'content-type': 'text/html', 'cache-control': 'no-store', 'x-audit': 'fixture' };
+  if (u.pathname === '/auth/start') return new Response('',{status:302,headers:{...headers,location:authBases.microsoft+'/auth/authorize'+u.search}});
+  if (u.pathname === '/auth/authorize') return new Response(`<script>location.replace(${JSON.stringify(authBases.okta+'/auth/environment'+u.search)})</script>`,{headers});
+  if (u.pathname === '/auth/environment') {
+    const mode=u.searchParams.get('mode');
+    const target=authBases.microsoft+'/auth/assertion';
+    if(mode==='refresh') return new Response('Environment check',{headers:{...headers,refresh:`35; url=${target}`}});
+    if(mode==='meta') return new Response(`<meta http-equiv="refresh" content="35; url=${target}">`,{headers});
+    if(mode==='script') return new Response(`<script>setTimeout(()=>location.replace(${JSON.stringify(target)}),35000)</script>`,{headers});
+    return new Response(`<form method="post" action="${target}"><input type="hidden" name="assertion" value="auth-body-must-not-be-retained"></form><script>setTimeout(()=>document.forms[0].${mode==='requestSubmit'?'requestSubmit':'submit'}(),35000)</script>`,{headers});
+  }
+  if (u.pathname === '/auth/assertion') return new Response('',{status:303,headers:{...headers,location:authBases.app+'/auth/callback?code=auth-code-private','x-seen-method':request.method}});
+  if (u.pathname === '/auth/callback') return new Response('',{status:302,headers:{...headers,location:authBases.app+'/auth/signed-in'}});
   if (u.pathname.startsWith('/redirect/')) {
     const codes = u.pathname.slice('/redirect/'.length).split(',').filter(Boolean).map(Number);
     return new Response('', { status: codes[0], headers: { ...headers, location: codes.length > 1 ? `/redirect/${codes.slice(1).join(',')}` : '/final?token=private' } });
@@ -45,6 +57,7 @@ const server = Bun.serve({ port: 0, hostname: '127.0.0.1', fetch(request) {
   return new Response('<h1>Final response</h1>',{headers});
 } });
 const base: string = `http://127.0.0.1:${server.port}`;
+const authBases=Object.fromEntries(['app','microsoft','okta'].map(name=>[name,`http://${name}.redirect-inspector.test:${server.port}`])) as Record<'app'|'microsoft'|'okta',string>;
 const profile = await mkdtemp(`${tmpdir()}/redirect-inspector-test-`);
 const certPath = resolve(profile,'fixture.crt');
 const keyPath = resolve(profile,'fixture.key');
@@ -58,7 +71,7 @@ const tlsServer=Bun.serve({port:0,hostname:'127.0.0.1',tls:{key:Bun.file(keyPath
 const secureBase: string = `https://redirect-inspector.test.dev:${tlsServer.port}`;
 const extension = resolve(process.env.EXTENSION_DIR ?? 'dist/extension');
 const executablePath = process.env.CHROME_BIN;
-const launch = () => chromium.launchPersistentContext(profile, { channel:'chromium', headless: true, ...(executablePath ? {executablePath} : {}), args: [`--disable-extensions-except=${extension}`, `--load-extension=${extension}`, '--no-proxy-server', '--host-resolver-rules=MAP redirect-inspector.test.dev 127.0.0.1', `--ignore-certificate-errors-spki-list=${spki}`] });
+const launch = () => chromium.launchPersistentContext(profile, { channel:'chromium', headless: true, ...(executablePath ? {executablePath} : {}), args: [`--disable-extensions-except=${extension}`, `--load-extension=${extension}`, '--no-proxy-server', '--host-resolver-rules=MAP redirect-inspector.test.dev 127.0.0.1, MAP *.redirect-inspector.test 127.0.0.1', `--ignore-certificate-errors-spki-list=${spki}`] });
 let context: BrowserContext | undefined;
 let worker!: Worker;
 const checks: string[] = [];
@@ -72,7 +85,7 @@ async function boot() {
   context.on('console', message => { if (message.type() === 'error' && message.location().url.startsWith('chrome-extension://')) workerErrors.push(message.text()); });
   context.on('request', request => {
     const url = request.url();
-    if (/^https?:/.test(url) && !url.startsWith(base) && !url.includes(`redirect-inspector.test.dev:${tlsServer.port}`) && !url.startsWith('http://missing.invalid')) external.push(url);
+    if (/^https?:/.test(url) && !url.startsWith(base) && !Object.values(authBases).some(origin=>new URL(url).origin===origin) && !url.includes(`redirect-inspector.test.dev:${tlsServer.port}`) && !url.startsWith('http://missing.invalid')) external.push(url);
   });
   worker = context.serviceWorkers()[0] ?? await context.waitForEvent('serviceworker');
   await worker.evaluate(() => chrome.runtime.id);
@@ -292,6 +305,61 @@ try {
   assert.equal(await snapshot(id),undefined);
   mark('live popup selection, filtering, pause/resume, full/redacted JSON, real clipboard write and clear');
   await popup.close();
+
+  // No worker polling during the 35-second environment check. Its navigation event
+  // must wake a fresh worker and restore the chain before the auth return arrives.
+  const authPages=[];
+  for(const mode of ['submit','requestSubmit','script','meta','refresh'] as const){
+    const authPage=await context!.newPage();
+    await authPage.goto(authBases.app+'/auth/start?mode='+mode).catch(()=>{});
+    await authPage.waitForURL(authBases.okta+'/auth/environment?mode='+mode);
+    const authId=(await tabId(authPage.url()))!;
+    const before=await waitState(authId,s=>s.capture.complete&&s.request?.committed===true&&s.capture.hops.length===3);
+    authPages.push({page:authPage,id:authId,mode,captureId:before.capture.id});
+  }
+  const authSession=await context!.newCDPSession(page);
+  await worker.evaluate(()=>{(globalThis as any).__authBeforeStop='old execution';});
+  const authVersion=new Promise<string>((resolve,reject)=>{
+    const timer=setTimeout(()=>reject(new Error('Auth worker version not observed')),5000);
+    authSession.on('ServiceWorker.workerVersionUpdated',event=>{
+      const found=event.versions.find(v=>v.scriptURL===worker.url()&&v.runningStatus==='running');
+      if(found){clearTimeout(timer);resolve(found.versionId);}
+    });
+  });
+  await authSession.send('ServiceWorker.enable');
+  await authSession.send('ServiceWorker.stopWorker',{versionId:await authVersion});
+  await Promise.all(authPages.map(({page})=>page.waitForURL(authBases.app+'/auth/signed-in',{timeout:45000})));
+  assert.equal(await worker.evaluate(()=>(globalThis as any).__authBeforeStop),undefined);
+  for(const auth of authPages){
+    const restored=await waitState(auth.id,s=>s.capture.complete&&s.request?.committed===true&&s.capture.hops.at(-1)?.url===authBases.app+'/auth/signed-in');
+    assert.equal(restored.capture.id,auth.captureId,`${auth.mode}: original auth capture retained`);
+    const mechanism=['submit','requestSubmit'].includes(auth.mode)?'form':auth.mode==='script'?'javascript':auth.mode;
+    assert.deepEqual(restored.capture.hops.map(h=>h.kind),['http','javascript',mechanism,'http','http','final']);
+    assert.deepEqual(restored.capture.hops.map(h=>h.status),[302,200,200,303,302,200]);
+    assert.equal(restored.capture.hops[3].method,['submit','requestSubmit'].includes(auth.mode)?'POST':'GET');
+    assert(!JSON.stringify(restored).includes('auth-body-must-not-be-retained'));
+    if(auth.mode==='requestSubmit'){
+      await auth.page.bringToFront();
+      const authPopupPromise=context!.waitForEvent('page');
+      await worker.evaluate(url=>chrome.tabs.create({url,active:false}),popupUrl);
+      const authPopup=await authPopupPromise;
+      await authPopup.getByRole('button',{name:/^Step 3: Form submission/}).click();
+      assert.deepEqual(await authPopup.locator('.hop .status-badge').allTextContents(),['302','JS','FORM','303','302','200']);
+      await authPopup.getByText('Form submission',{exact:true}).waitFor();
+      const downloadPromise=authPopup.waitForEvent('download');
+      await authPopup.getByRole('button',{name:'Export JSON',exact:true}).click();
+      const exported=await Bun.file((await(await downloadPromise).path())!).text();
+      assert(!exported.includes('auth-code-private'));
+      assert(!exported.includes('auth-body-must-not-be-retained'));
+      assert.equal(JSON.parse(exported).hops[2].kind,'form');
+      await authPopup.screenshot({path:'test-results/auth-popup.png'});
+      await authPopup.close();
+      mark('auth popup distinguishes FORM from JS and redacts callback code in export');
+    }
+    mark(`35-second cross-origin auth ${auth.mode} return survives worker suspension with its full chain`);
+    await auth.page.close();
+  }
+  await authSession.detach();
 
   // Stop only the extension worker through CDP; its next event must hydrate session state.
   await page.goto(`${base}/redirect/301`);

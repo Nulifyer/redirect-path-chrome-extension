@@ -2,7 +2,7 @@
 
 Updated: 2026-11-03
 Owner: primary agent
-State: user-controlled incognito released and installed; browser reload belongs to the user
+State: delayed automatic auth handoffs fixed and verified locally; release preparation
 
 ## Project state
 
@@ -16,15 +16,15 @@ The README now introduces the product; `docs/` contains end-user guides and exam
 
 ## Current batch
 
-The user's incognito correction is complete. Standard browser controls determine private-window access. Captures stay in session memory, keyed by tab, with cleanup on tab close. Published and installed v0.1.6. No delegated tasks.
+The user reports a lost delayed third-party auth chain: page → Microsoft → Okta → Microsoft → callback → app. Preserve earlier observed responses through delayed client navigation, form POST handoffs and worker suspension. Capture automatically, without retaining form bodies. Keep ordinary navigation boundaries honest and browser controls under the user's control.
 
 ## In progress
 
-None. Browser activation is the user's step.
+Reproduced automatic POST chain loss against v0.1.6 and fixed the form-submit boundary. Scripted requestSubmit events no longer count as user input. FORM distinguishes the handoff. Local type checking, 32 unit tests, 14 updater tests, 42 browser groups and seven popup scenarios pass. All eight incognito checks, including automatic form handoff, pass. No delegated tasks.
 
 ## Next action
 
-No implementation work remains for this batch. The user reloads their extension entry and chooses Allow in incognito. Leave Brave controls to the user. Discuss Web Store release automation only when requested.
+Commit/tag v0.1.7, run hosted checks, verify downloaded release assets, publish and run the end-user updater. The exact private organization flow has not been exercised. Leave Brave controls to the user.
 
 ## Blockers
 

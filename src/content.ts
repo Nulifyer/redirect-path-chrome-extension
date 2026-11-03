@@ -20,7 +20,9 @@ import { refreshTarget } from './refresh';
   observer.observe(document, { subtree: true, childList: true, attributes: true, attributeFilter: ['content', 'http-equiv'] });
   document.addEventListener('DOMContentLoaded', checkMeta, { once: true });
   document.addEventListener('DOMContentLoaded', () => { observer.disconnect(); if(document.head) observer.observe(document.head, { subtree:true,childList:true,attributes:true,attributeFilter:['content','http-equiv'] }); },{once:true});
-  for (const name of ['pointerdown', 'keydown', 'click', 'submit']) document.addEventListener(name, event => {
+  // requestSubmit() produces a trusted submit event even without user input.
+  // Observe input gestures instead so automatic auth POSTs remain in their chain.
+  for (const name of ['pointerdown', 'keydown', 'click']) document.addEventListener(name, event => {
     if (event.isTrusted && Date.now()-lastGesture>100) { lastGesture=Date.now(); send({ userGesture: true }); }
   }, { capture: true, passive: true });
 })();

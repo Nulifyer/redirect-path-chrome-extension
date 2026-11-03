@@ -26,6 +26,7 @@ The live MV3 extension implements the following behavior. The offline design pre
 | Browser navigation commit | Correlate document ID, URL, and transition qualifiers with captured requests |
 | Meta refresh | Use observed target and delay as classification evidence |
 | HTTP Refresh header | Match its resolved target to the next navigation and show REF with the declared delay |
+| Automatic form submission | Preserve the preceding chain through GET/POST handoffs, with a FORM badge and no retained form body |
 | Client navigation without meta evidence | Label JavaScript classification as inferred when that is all the evidence supports |
 | Typed URL, clicked link, reload, back/forward | Start a new capture, while retaining the correct in-flight HTTP hops |
 | HSTS upgrade | Label it as a browser upgrade, separate from a network response |
@@ -112,7 +113,8 @@ The UI labels their sum as request time, not full page-load time.
 Chrome can omit its client_redirect qualifier when a scripted navigation then receives an HTTP redirect.
 The reducer therefore also considers a link transition without a recent trusted page gesture as an inferred JavaScript redirect.
 Trusted gestures within 1.5 seconds of request start, address-bar navigation, reload, and back/forward prevent that inference.
-A matching observed meta-refresh target takes precedence.
+Browser-reported form_submit transitions without recent input continue the chain as FORM. A submit event alone is not user-input evidence: requestSubmit() can dispatch a trusted submit event without interaction. Pointer, key and click signals still identify user-initiated navigation.
+There is no elapsed-time cutoff on a delayed client handoff. A matching observed meta-refresh target takes precedence over JavaScript inference.
 Delayed user-triggered scripts and automatic navigation shortly after unrelated interaction can remain ambiguous.
 The popup labels JavaScript redirects as inferred rather than claiming script-source attribution.
 

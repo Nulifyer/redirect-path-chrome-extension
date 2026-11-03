@@ -119,7 +119,8 @@ export function record(input: TabState | undefined, event: CaptureEvent): TabSta
       const userNavigation = ['typed', 'auto_bookmark', 'reload', 'generated', 'keyword', 'keyword_generated'].includes(event.transition) || event.qualifiers.includes('forward_back') || event.qualifiers.includes('from_address_bar') || recentGesture;
       // Chrome can omit client_redirect when a scripted navigation then redirects over HTTP.
       // A link transition without a trusted page gesture is only an inference, never script attribution.
-      const clientRedirect = previous && !userNavigation && (event.qualifiers.includes('client_redirect') || event.transition === 'link');
+      const formSubmission = event.transition === 'form_submit';
+      const clientRedirect = previous && !userNavigation && (event.qualifiers.includes('client_redirect') || event.transition === 'link' || formSubmission);
       if (clientRedirect) {
         const prior = previous.capture;
         const last = prior.hops.at(-1);
@@ -128,9 +129,9 @@ export function record(input: TabState | undefined, event: CaptureEvent): TabSta
           const metaMatch = meta && state.request!.urls.some(url => sameUrl(url, meta.url));
           const refresh = refreshTarget(header(last, 'refresh') ?? '', last.url);
           const refreshMatch = refresh && state.request!.urls.some(url => sameUrl(url, refresh.url));
-          last.kind = metaMatch ? 'meta' : refreshMatch ? 'refresh' : 'javascript';
-          if (metaMatch) last.metaDelaySeconds = meta.delay;
-          if (refreshMatch && !metaMatch) last.refreshDelaySeconds = refresh.delay;
+          last.kind = formSubmission ? 'form' : metaMatch ? 'meta' : refreshMatch ? 'refresh' : 'javascript';
+          if (!formSubmission && metaMatch) last.metaDelaySeconds = meta.delay;
+          if (!formSubmission && refreshMatch && !metaMatch) last.refreshDelaySeconds = refresh.delay;
           last.redirectUrl = state.request!.urls[0];
           const offset = prior.hops.length;
           state.capture = { ...state.capture, id: prior.id, label: prior.label, startedAt: prior.startedAt, hops: [...prior.hops, ...state.capture.hops], truncated: prior.truncated };

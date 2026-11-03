@@ -38,6 +38,9 @@ describe('capture presentation', () => {
     const refresh={...client.hops[2],kind:'refresh' as const,refreshDelaySeconds:1};
     expect(hopBadge(refresh)).toBe('REF');
     expect(hopDescription(refresh)).toBe('HTTP Refresh · 1s delay · HTTP 200');
+    const form={...client.hops[2],kind:'form' as const};
+    expect(hopBadge(form)).toBe('FORM');
+    expect(hopDescription(form)).toBe('Form submission · HTTP 200');
   });
   test('exports structured evidence with an explicit sample marker', () => {
     const exported = JSON.parse(exportCapture(captures[0]));

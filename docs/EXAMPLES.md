@@ -56,6 +56,11 @@ Inspect the following HTTPS response to see what the server returned.
 
 ## Share a login-redirect problem
 
+Automatic sign-in can visit several providers before returning to the app. Let the entire flow finish before opening the popup.
+The chain can include delayed redirects and automatic form handoffs, shown with a **FORM** badge.
+Select a FORM step to inspect the response that led to the submission. Form contents are not captured.
+Request time covers network requests; it does not include time spent waiting on an environment check.
+
 1. Reproduce the problem in the affected tab.
 2. Open the extension and check the route to the final login or error page.
 3. Leave **Include full values in copy and export** unchecked.

@@ -28,6 +28,7 @@ Choose **Overview** to return to the response summary.
 | `HSTS` | The browser switches to HTTPS before contacting the server for that step. |
 | `META` | The page directs the browser to another URL using a meta refresh. Select the step to see its delay. |
 | `REF` | An HTTP Refresh header directs the browser to another URL. Select the step to see its delay. |
+| `FORM` | A page automatically submits a form to continue the route. Form contents are not captured. |
 | `JS` | The navigation appears to be a JavaScript redirect. This is inferred and does not identify the script. |
 | `200` | A successful final response. Other final HTTP status codes appear as received. |
 | `ERR` | The request failed without an HTTP response. Select the step for the error. |

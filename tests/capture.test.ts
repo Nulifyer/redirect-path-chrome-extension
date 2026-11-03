@@ -3,7 +3,7 @@ import { record, safeHeaders, type TabState, type CaptureEvent } from '../src/ca
 import { exportCapture, copySummary, redactUrl, type Capture } from '../src/model';
 
 function events(values: CaptureEvent[]) { let state: TabState | undefined; for (const e of values) state = record(state, e); return state!; }
-const start = (requestId = 'a', url = 'https://example.com/a', time = 1): CaptureEvent => ({ type: 'start', requestId, url, time, method: 'GET' });
+const start = (requestId = 'a', url = 'https://example.com/a', time = 1): Extract<CaptureEvent,{type:'start'}> => ({ type: 'start', requestId, url, time, method: 'GET' });
 type ResponseEvent = Extract<CaptureEvent, { type: 'headers' | 'redirect' | 'complete' | 'error' }>;
 const response = (type: 'redirect' | 'complete' | 'headers', requestId = 'a', url = 'https://example.com/a', status = 200, time = 10): ResponseEvent => ({ type, requestId, url, status, time });
 const commit = (url = 'https://example.com/a', qualifiers: string[] = [], transition = 'link', documentId = 'd'): CaptureEvent => ({ type: 'commit', url, qualifiers, transition, documentId, time: 12 });
@@ -80,6 +80,30 @@ test('HTTP Refresh uses its response header and retains its declared delay', () 
   const s=events([start(),{...response('complete'),headers:[{name:'Refresh',value:'1; URL=/b'}]},commit(),
     start('b',b,20),response('complete','b',b,200,30),commit(b,['client_redirect'],'link','d2')]);
   expect(s.capture.hops[0]).toMatchObject({url:a,kind:'refresh',refreshDelaySeconds:1,status:200});
+});
+test('automatic form POST preserves the auth chain after a long idle period', () => {
+  const app='https://app.example/start',provider='https://idp.example/environment',assertion='https://login.example/assertion',callback='https://app.example/callback';
+  const s=events([start('app',app),{...response('redirect','app',app,302),redirectUrl:provider},start('app',provider,11),response('complete','app',provider,200,20),commit(provider,[], 'typed','idp'),
+    navigate(assertion,180_000),{...start('post',assertion,180_001),method:'POST'},
+    {...response('redirect','post',assertion,303,180_010),redirectUrl:callback},start('post',callback,180_011),response('complete','post',callback,200,180_020),
+    {...commit(callback,['server_redirect'],'form_submit','callback'),time:180_021}]);
+  expect(s.capture.label).toBe(app);
+  expect(s.capture.hops.map(h=>[h.status,h.kind])).toEqual([[302,'http'],[200,'form'],[303,'http'],[200,'final']]);
+  expect(s.capture.hops.map(h=>h.method)).toEqual(['GET','GET','POST','GET']);
+});
+test('delayed script redirects have no elapsed-time cutoff', () => {
+  const a='https://example.com/a',b='https://example.com/b';
+  const s=events([start(),response('complete'),commit(),navigate(b,600_000),start('b',b,600_001),response('complete','b',b,200,600_010),
+    {...commit(b,[],'link','d2'),time:600_011}]);
+  expect(s.capture.hops.map(h=>h.kind)).toEqual(['javascript','final']);
+  expect(s.capture.label).toBe(a);
+});
+test('a user-submitted form still starts a fresh capture', () => {
+  const a='https://example.com/a',b='https://example.com/b';
+  const s=events([start(),response('complete'),commit(),{type:'document',documentId:'d',url:a,userGesture:true,time:14},
+    {...start('b',b,15),method:'POST'},response('complete','b',b,200,20),commit(b,[],'form_submit','d2')]);
+  expect(s.capture.label).toBe(b);
+  expect(s.capture.hops.map(h=>h.kind)).toEqual(['final']);
 });
 test('trusted user gesture and back/forward prevent a client classification', () => {
   const before = [start(), response('complete'), commit(), { type: 'document', documentId: 'd', url: 'https://example.com/a', userGesture: true, time: 14 } as CaptureEvent];
