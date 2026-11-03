@@ -2,7 +2,7 @@
 
 Updated: 2026-11-03
 Owner: primary agent
-State: redirect matrix verified, v0.1.4 published and installed
+State: user-controlled incognito verified locally; release preparation in progress
 
 ## Project state
 
@@ -16,15 +16,15 @@ The README now introduces the product; `docs/` contains end-user guides and exam
 
 ## Current batch
 
-Completed: Maps retains 302/302/200 across request-ID changes; expanded tests cover mixed redirect mechanisms and navigation boundaries. HTTP Refresh has a REF badge and redacted header targets. v0.1.4 passed local/hosted checks, was published, and was installed through the actual end-user updater.
+Remove the incognito restriction and preserve normal browser controls, per the user's explicit correction. Use standard spanning mode with per-tab session-memory capture. Add browser permission, capture, popup, lifetime and worker-restoration checks, then publish/install v0.1.5. Do not operate the user's Brave controls.
 
 ## In progress
 
-No running implementation or delegated tasks.
+Standard spanning mode and live-tab hydration support the browser's incognito permission. All eight incognito checks, 36 redirect check groups, 29 unit tests, 14 updater tests and the popup UI suite pass. No delegated tasks.
 
 ## Next action
 
-Respond to feedback on the installed release. Keep the scenario matrix as a regression gate. Leave Brave controls to the user and discuss Chrome Web Store publication only when requested.
+Commit/tag v0.1.5, run hosted checks, verify downloaded release assets, publish, and run redirect-inspector-update. Keep the user's native incognito/site-access choices available; leave Brave controls to the user.
 
 ## Blockers
 

@@ -7,7 +7,7 @@
 3. Reload the webpage, then open the popup again.
 
 The extension cannot reconstruct a page load that happened before installation or while recording was paused.
-Browser settings pages cannot be captured. Incognito is unavailable in this version.
+Browser settings pages cannot be captured. For private windows, enable **Allow in incognito** in the extension's browser **Details** page, then reload the webpage.
 
 If you restricted the extension's site access, allow it to run on the site you are auditing, then reload the page.
 

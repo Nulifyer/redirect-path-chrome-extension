@@ -5,6 +5,7 @@
 - Read `.agents/README.md` and current project records before substantial work.
 - Redirect Inspector is the user's own redirect debugging and auditing tool. Develop its code, interface, and documentation around its own goals.
 - Capture automatically on page load, as confirmed by the user on 2026-11-03.
+- Keep standard browser controls available, including user-controlled incognito access and site permissions. Do not impose unrequested feature restrictions.
 - Keep captured navigation evidence local and session-only. No AI endpoint, telemetry, promotional links, remote assets, or unsolicited tabs.
 - Use Base UI controls and the T3 Code / Material 3 direction recorded in `.agents/reference/DESIGN.md`.
 - The live extension must use actual captured navigation evidence. Keep the offline sample preview clearly identified.

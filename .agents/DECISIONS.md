@@ -12,6 +12,7 @@
 | D6 | Defer Web Store release automation | User wants a later workflow discussion | User request, 2026-11-03 |
 | D7 | Run the end-user installation/update script; leave Brave controls to the user | User explicitly asked to handle browser reload personally | User clarification, 2026-11-03 |
 | D8 | Verify a broad redirect scenario matrix | Maps exposed a request-lifecycle gap; the user requires different mechanisms and navigation boundaries to work correctly | User request, 2026-11-03 |
+| D9 | Keep incognito access and other standard extension controls under the user's control | The user rejected unrequested restrictions on normal browser features | User clarification, 2026-11-03 |
 
 ## Working implementation choices
 
@@ -36,7 +37,7 @@ Implementation, research, and verification records belong under `.agents/`.
 
 ## Open decisions
 
-- Optional incognito support after the first desktop release.
+None.
 
 ## Superseded decisions
 

@@ -25,6 +25,7 @@ bun run package
 bunx playwright install chromium
 bun run test:ui
 EXTENSION_DIR=dist/release/extension bun run test:browser
+EXTENSION_DIR=dist/release/extension bun run test:incognito
 ```
 
 Set `CHROME_BIN` to an existing compatible full Chromium executable if needed.
@@ -47,4 +48,4 @@ The package builder generates a deterministic ZIP through Python and includes bu
 JavaScript redirects remain inferred from navigation signals and recent trusted gestures. This does not identify script source.
 History restores, protected browser pages, or restricted site access can lack network metadata.
 This is not a full accessibility audit, an exhaustive public-site compatibility audit, or verification of every Chromium derivative.
-Web Store packaging/submission and incognito are not covered.
+Web Store packaging/submission is not covered. Incognito checks use a disposable Chromium profile and the standard browser permission toggle; they do not change the user's browser settings.

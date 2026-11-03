@@ -23,7 +23,9 @@ If your browser is managed by an organization, its settings may prevent this ins
 4. Select a step to inspect that response's details.
 
 Recording starts when a page loads. A page that was already open before installation needs a reload.
-Browser settings pages cannot be captured. Incognito is unavailable in this version.
+Browser settings pages cannot be captured.
+
+To use it in private windows, open the extension's **Details** in your browser's extension manager and enable **Allow in incognito**. Website access is also controlled by the browser's normal site permissions.
 
 ## Keep it updated
 

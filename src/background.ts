@@ -9,7 +9,7 @@ const ready = (async () => {
   await chrome.storage.session.setAccessLevel({ accessLevel: 'TRUSTED_CONTEXTS' });
   const [stored, preferences, tabs] = await Promise.all([chrome.storage.session.get(null), chrome.storage.local.get('paused'), chrome.tabs.query({})]);
   paused = preferences.paused === true;
-  const alive = new Set(tabs.filter(t => !t.incognito).map(t => t.id));
+  const alive = new Set(tabs.map(t => t.id));
   const stale: string[] = [];
   for (const [name, value] of Object.entries(stored)) {
     const state = value as TabState | undefined;

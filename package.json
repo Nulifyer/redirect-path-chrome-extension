@@ -1,6 +1,6 @@
 {
   "name": "redirect-path-chrome-extension",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,6 +9,7 @@
     "test": "bun test",
     "test:ui": "bun scripts/check-ui.ts",
     "test:browser": "bun scripts/check-extension.ts",
+    "test:incognito": "bun scripts/check-incognito.ts",
     "package": "bun scripts/package.ts",
     "test:updater": "python3 -B -m unittest discover -s tests/updater -p '*_test.py' -v"
   },

@@ -33,7 +33,7 @@ The live MV3 extension implements the following behavior. The offline design pre
 | Worker suspension | Restore only still-valid session records before processing queued events |
 | Tab closed or Clear capture | Delete the matching session key explicitly |
 | Browser restart | Start without prior-session browsing captures |
-| Incognito | Disable in the first release unless explicitly supported and tested |
+| Incognito | User-controlled through the browser's normal toggle; spanning worker with distinct per-tab captures and the same session lifetime |
 | Internal browser page | Explain that capture is unavailable |
 
 [Chrome does not define ordering](https://developer.chrome.com/docs/extensions/reference/api/webNavigation#relation_to_webrequest_events)

@@ -33,6 +33,7 @@ Inspect all four sizes on light and dark backgrounds. Ordinary builds copy the P
 bunx playwright install chromium
 bun run test:ui
 bun run test:browser
+bun run test:incognito
 ```
 
 Set `CHROME_BIN=/path/to/chromium` to use an existing compatible browser.

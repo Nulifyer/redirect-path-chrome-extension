@@ -25,7 +25,9 @@ Controlled browser fixtures are the repeatable acceptance check. Live Maps is an
 | HSTS upgrade | Explicit browser upgrade, not a server connection |
 | 404, 500, DNS failure, redirect loop | Honest failure evidence, including repeated redirect hops |
 | Concurrent tabs, worker suspension, browser restart | Existing isolation and lifetime guarantees remain intact |
+| Browser-controlled incognito access | Native permission can be enabled and disabled; the same redirect mechanisms work in private tabs |
+| Private popup, worker suspension and window closure | Popup reads the private active tab; private captures survive worker suspension and disappear when their tabs close, without altering regular captures |
 
 Each browser assertion is recorded in ignored `test-results/extension.json`. Normalized recorded-event regressions cover event order and request-ID changes that are not deterministic on a local fixture server. Public Maps evidence is kept under ignored `test-results/`.
 
-All contract rows passed their relevant local checks on 2026-11-03: 36 browser check groups and 29 unit tests, plus the seven-scenario popup UI suite. Both pushState and replaceState were exercised without altering the network capture. The HTTP Refresh popup export was checked for query-value redaction. Exact release evidence belongs in VERIFICATION.md.
+All contract rows passed their relevant local checks on 2026-11-03: 36 redirect browser check groups, eight incognito browser check groups and 29 unit tests, plus the seven-scenario popup UI suite. Both pushState and replaceState were exercised without altering the network capture. The HTTP Refresh popup export was checked for query-value redaction. Exact release evidence belongs in VERIFICATION.md.

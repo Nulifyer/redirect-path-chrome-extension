@@ -1,5 +1,15 @@
 # Verification
 
+## User-controlled incognito access
+
+The user's instruction supersedes the earlier incognito restriction. Standard spanning mode now leaves access under the browser's native Allow in incognito setting, without an extension-specific gate. The existing session-memory capture store remains keyed by tab. Worker hydration includes every accessible live tab, including private tabs when permission is enabled.
+
+On 2026-11-03, all eight dedicated incognito browser checks passed against the packaged extension: native default-off permission, enabling access through the real extension manager API, HTTP/JavaScript/meta/HTTP Refresh capture, regular/private capture separation, the actual private-window toolbar popup reading its active tab, private capture restoration after worker suspension, deletion of all private captures on window close, and the native opt-out toggle. Permission changes reload the extension worker, so the test observes its replacement. The native private-window popup is inspected through its CDP target because Playwright does not expose it as a Page.
+
+Type checking, 29 unit tests, 14 updater tests, 36 existing redirect browser check groups and seven popup UI scenarios also passed. Both hosted workflows now run the incognito suite. The user guides explain native controls and memory-only per-tab lifetime. All browser tests use disposable profiles; the user's Brave controls remain untouched.
+
+Release v0.1.5 publication and permanent installation are pending. Exact local evidence is in ignored test-results/incognito.json, extension.json and ui.json.
+
 ## Redirect scenario expansion and Maps
 
 Live v0.1.3 traces reproduced lost Maps redirects: Chrome emitted net::ERR_ABORTED retries and direct redirect handoffs under new request IDs, while the old capture reset to the final 200 response. The normalized-event regression covers both paths, fresh same-URL visits, delayed navigation-start delivery, and terminal failures.

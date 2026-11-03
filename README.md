@@ -14,6 +14,8 @@ See the final response and redirect count first. Follow each step in order, then
 
 Spot HTTP redirects, browser HTTPS upgrades, meta and HTTP refreshes, and inferred JavaScript redirects by their badges. Failed responses and network errors stay visible in the chain.
 
+Use it in regular or private windows. Control incognito access and website permissions through your browser's normal extension settings.
+
 ## Made for everyday audits
 
 - Check that old URLs reach the right new pages.

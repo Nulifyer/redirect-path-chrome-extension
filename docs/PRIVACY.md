@@ -18,13 +18,14 @@ Restricting site access can leave a capture incomplete or unavailable.
 
 ## How long captures stay
 
-Captures are temporary. A new navigation replaces the tab's previous capture, and closing a tab deletes its capture.
+Captures stay in memory for the current browser session.
+A new navigation replaces the tab's previous capture, and closing a tab deletes its capture.
 Restarting the browser, reloading the extension, or updating it also clears captures.
 Older captures may be cleared when space is needed.
 
 Use **Clear capture** to delete the current tab's capture, or **Pause recording** to stop recording new visits.
 Your theme and pause preference are remembered separately. Captures are not synced to other browsers.
-Incognito is unavailable in this version.
+You control private-window access through the browser's **Allow in incognito** setting. Private captures follow the same temporary, per-tab lifetime and are deleted when their tabs close. Theme and pause preferences apply across regular and private windows.
 
 ## What copy and export include
 
