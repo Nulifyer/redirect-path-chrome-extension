@@ -10,9 +10,11 @@ Type checking, 29 unit tests, all 36 real-browser check groups, and seven popup 
 
 HTTP Refresh now has a REF badge and declared delay. A real popup download verified that its header target query values are redacted; unit checks cover malformed declarations and explicit full export. Early document metadata survives commit ordering. JavaScript attribution remains inferred, and this matrix does not prove every public site or Chromium derivative.
 
-The actual public end-user helper was downloaded to ~/.local/bin/redirect-inspector-update and installed v0.1.3 at ~/.local/share/chrome-extensions/nulifyer-redirect-inspector. Metadata matched the public release. The user clarified that Brave's load/reload controls are theirs to handle; browser UI automation stopped. Publication and end-user update to v0.1.4 are pending.
+The [source checks](https://github.com/Nulifyer/redirect-path-chrome-extension/actions/runs/41694753975) and [tagged-release workflow](https://github.com/Nulifyer/redirect-path-chrome-extension/actions/runs/41694753178) passed for `bab959662b59db0a514fd40e06758c91b7aa565b`, including all 14 updater tests. [v0.1.4](https://github.com/Nulifyer/redirect-path-chrome-extension/releases/tag/v0.1.4) was published after its downloaded checksum, metadata, all 15 ZIP entries, and helper matched the local tagged build. ZIP SHA-256: `eb820330a706f7096fd0d2b85ea79b9d380eb742598136a6a9197608c0825072`.
 
-Ignored evidence: test-results/extension.json, ui.json, maps-observation.json, maps-latest.json, and maps-fixed.log. No signed link tokens or personal browser screenshots were retained in tracked files.
+The actual public end-user helper was downloaded to ~/.local/bin/redirect-inspector-update. It first installed v0.1.3 and then updated the same permanent folder, ~/.local/share/chrome-extensions/nulifyer-redirect-inspector, to published v0.1.4. All 15 installed files match the public ZIP byte for byte; the installed helper matches the public release helper. Its check-only lookup reports Latest 0.1.4 / Installed 0.1.4. The user clarified that Brave's load/reload controls are theirs to handle; browser UI automation stopped. Installation on disk is verified; browser activation remains the user's step.
+
+Ignored evidence: test-results/extension.json, ui.json, maps-observation.json, maps-latest.json, maps-fixed.log, hosted-release-v0.1.4/verification.json, and installed-release-v0.1.4.json. No signed link tokens or personal browser screenshots were retained in tracked files.
 
 ## Icon artwork
 
