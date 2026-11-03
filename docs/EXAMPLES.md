@@ -50,7 +50,7 @@ Redirect Inspector shows the observed route. It does not establish whether the c
 
 Enter the HTTP version of a URL and inspect its first step.
 
-If it says **Browser HTTPS upgrade**, the browser performed that step locally.
+If the badge says **HSTS**, the browser performed that step locally. Select it to see **Browser HTTPS upgrade** in the response details.
 Do not treat it as evidence that the server returned the same redirect.
 Inspect the following HTTPS response to see what the server returned.
 

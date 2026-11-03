@@ -20,12 +20,12 @@ A failed connection may never receive an HTTP status. Cached responses and brows
 Some headers are unavailable or contain values the extension does not retain.
 An unavailable value should not be read as a successful response or a zero-duration request.
 
-## A JavaScript redirect label looks unexpected
+## A JS badge looks unexpected
 
-The label is an inference, rather than identification of the script that caused the navigation.
+The `JS` badge marks an inferred JavaScript redirect. It does not identify the script that caused the navigation.
 Delayed actions and other activity on the page can make the result ambiguous.
 
-Reload the starting URL and reproduce the route again. Check the final URL and available response details alongside the label.
+Reload the starting URL and reproduce the route again. Check the final URL and available response details alongside the badge.
 
 ## An on-page change does not appear in the chain
 

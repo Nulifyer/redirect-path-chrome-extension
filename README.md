@@ -12,7 +12,7 @@ Load a page, click the extension, and follow the chain. Spot an unnecessary redi
 
 See the final response and redirect count first. Follow each step in order, then select a response to inspect its headers, server IP, cache information, and request time.
 
-HTTP redirects, browser HTTPS upgrades, meta refreshes, and inferred JavaScript redirects have distinct labels. Failed responses and network errors stay visible in the chain.
+Spot HTTP redirects, browser HTTPS upgrades, meta refreshes, and inferred JavaScript redirects by their badges. Failed responses and network errors stay visible in the chain.
 
 ## Made for everyday audits
 

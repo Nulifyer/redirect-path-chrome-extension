@@ -9,7 +9,12 @@ The real-extension browser suite passed its controlled HTTP, JavaScript, meta, H
 
 The public URLs requested by the user were opened in the shared preview browser. Google reached www.google.com. The exact supplied YouTube link returned a 200 confirmation page with a Go To Site action and no meta refresh. Following that action reached go.lowlevel.tv/wizcode and then www.wiz.io/demo. This public-site observation verifies the destinations and confirmation behavior; redirect classification is covered by the isolated extension fixtures, not by this shared-browser observation. No signed link tokens were added to source or docs.
 
-Ignored evidence includes test-results/client-badges.png, ui.json, and extension.json. Release publication evidence follows after tagged-package validation.
+All 14 updater tests passed, and the final installation package passed the real-extension browser suite. The [source checks](https://github.com/Nulifyer/redirect-path-chrome-extension/actions/runs/41688531293) and [tagged release workflow](https://github.com/Nulifyer/redirect-path-chrome-extension/actions/runs/41688530670) passed for source commit `61e3b121e4626259df7dc9b366ada2b1c7a89b5f`.
+
+[v0.1.2](https://github.com/Nulifyer/redirect-path-chrome-extension/releases/tag/v0.1.2) was published after the downloaded draft's checksum, provenance, all 15 ZIP files, and helper matched the local tagged build. ZIP SHA-256: `da0306df847cd628a6ff835575bdb458caac2d8fc1897c9883da62132198a96d`.
+The actual helper's public check-only lookup reports latest version 0.1.2 without creating an installation.
+
+Ignored evidence includes test-results/client-badges.png, ui.json, extension.json, and hosted-release-v0.1.2/verification.json. The user's browser profile was not modified.
 
 ## Documentation audience update
 
